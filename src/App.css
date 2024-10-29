@@ -1,14 +1,21 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
+  height: 100vh;
+}
+
+#root {
+  height: 100%;
 }
 
 .widget {
+  height: 100%;
   padding: 10px;
   text-align: center;
   background-color: rgba(50, 50, 50, 0.8);
   color: white;
   border-radius: 8px;
+  box-sizing: border-box;
   -webkit-app-region: drag; /* Makes the widget draggable */
 }
 

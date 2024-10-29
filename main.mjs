@@ -16,7 +16,7 @@ let mainWindow;
 console.log('path', path.join(__dirname, 'preload.js'));
 app.on('ready', () => {
   mainWindow = new BrowserWindow({
-    width: 600,
+    width: 200,
     height: 200,
     frame: false,
     alwaysOnTop: true,

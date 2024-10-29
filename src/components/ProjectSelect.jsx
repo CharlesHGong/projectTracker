@@ -26,6 +26,7 @@ export const ProjectSelect = ({ children }) => {
 
   const content = (
     <div>
+      <div>Selected Projects</div>
       {projectNames.map((project) => (
         <div key={project} style={{ marginBottom: "8px" }}>
           <Checkbox
@@ -38,6 +39,7 @@ export const ProjectSelect = ({ children }) => {
       ))}
       <Button
         type="primary"
+        size="small"
         onClick={() => {
           usePageStore.getState().loadProjects();
           setVisible(false);
@@ -50,8 +52,8 @@ export const ProjectSelect = ({ children }) => {
 
   return (
     <Popover
+      placement="bottomRight"
       content={content}
-      title="Select Projects"
       trigger="click"
       open={visible}
       onOpenChange={handleVisibleChange}

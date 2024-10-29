@@ -1,4 +1,4 @@
-import React, { createRef, useState } from "react";
+import React, { useState } from "react";
 import { usePageStore } from "../store";
 import { Button } from "antd";
 
@@ -12,9 +12,10 @@ const formatTime = (totalTime) => {
 };
 
 export const ProjectTracker = ({ name }) => {
-  const [startTime, setStartTime] = useState(undefined);
   const [now, setNow] = useState(Date.now());
-  const removeIntervalRef = createRef();
+  const startTime = usePageStore((state) =>
+    state.workingProjectName === name ? state.startTime : undefined
+  );
   const previousTime = usePageStore((state) => {
     const projectLogs =
       state.projects.find((project) => project.name === name)?.logs || [];
@@ -23,26 +24,39 @@ export const ProjectTracker = ({ name }) => {
       0
     );
   });
-  const totalTime = previousTime + (startTime ? now - startTime : 0);
+  const totalTime =
+    previousTime + (startTime ? Math.max(0, now - startTime) : 0);
 
   const handleClick = () => {
+    const { handleStartOrStop } = usePageStore.getState();
     if (startTime) {
-      clearInterval(removeIntervalRef.current);
-      usePageStore.getState().addLog(name, startTime, Date.now());
-      setStartTime(undefined);
+      handleStartOrStop(name, undefined);
     } else {
-      setStartTime(Date.now());
-      removeIntervalRef.current = setInterval(() => {
+      const timeInterValRef = setInterval(() => {
         setNow(Date.now());
       }, 1000);
+      handleStartOrStop(name, timeInterValRef);
     }
   };
 
   return (
-    <div>
-      <span>{name}</span>
+    <div
+      style={{
+        margin: "4px 0px",
+        width: "100%",
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr 1fr",
+        gap: "10px",
+      }}
+    >
+      <span style={{ textAlign: "left" }}>{name}</span>
       <span>{formatTime(totalTime)}</span>
-      <Button size="small" onClick={handleClick}>
+      <Button
+        size="small"
+        onClick={handleClick}
+        variant="solid"
+        color={startTime ? "danger" : "primary"}
+      >
         {startTime ? "End" : "Start"}
       </Button>
     </div>

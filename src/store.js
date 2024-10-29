@@ -3,6 +3,9 @@ import { request } from "./api";
 
 export const usePageStore = create((set, get) => ({
   page: 'home',
+  startTime: undefined,
+  workingProjectName: '',
+  timeIntervalRef: undefined,
   projects: [],
   projectNames: [],
   selectedProjectNames: [],
@@ -31,4 +34,19 @@ export const usePageStore = create((set, get) => ({
     set({ projectNames, selectedProjectNames });
     get().loadProjects();
   },
+  handleStartOrStop: async (name, newTimeIntervalRef) => {
+    const isStart = newTimeIntervalRef !== undefined;
+    const { startTime, timeIntervalRef, workingProjectName, addLog } = get();
+    if (isStart) {
+      if (name !== workingProjectName && startTime) {
+        clearInterval(timeIntervalRef);
+        addLog(workingProjectName, startTime, Date.now());
+      }
+      set({ startTime: Date.now(), workingProjectName: name, timeIntervalRef: newTimeIntervalRef });
+    } else {
+      clearInterval(timeIntervalRef);
+      addLog(name, startTime, Date.now());
+      set({ startTime: undefined, workingProjectName: '', timeIntervalRef: undefined });
+    }
+  }
 }));
