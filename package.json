@@ -4,15 +4,16 @@
   "version": "1.0.0",
   "main": "main.mjs",
   "scripts": {
-    "start": "webpack serve",
-    "electron": "electron .",
-    "dev": "ELECTRON_ENABLE_LOGGING=1 concurrently \"npm run start\" \"npm run electron\"",
-    "build": "webpack --mode production",
-    "electron:build": "electron-builder"
+    "start:web": "webpack serve",
+    "start:electron": "electron .",
+    "dev": "ELECTRON_ENABLE_LOGGING=1 concurrently \"npm run start:web\" \"npm run start:electron\"",
+    "build:web": "webpack --mode production",
+    "build:electron": "electron-builder",
+    "build": "npm run build:web && npm run build:electron"
   },
   "build": {
-    "appId": "com.yourcompany.yourapp",
-    "productName": "YourAppName",
+    "appId": "com.charles-gong.projecttimetracker",
+    "productName": "Project Time Tracker",
     "directories": {
       "output": "dist"
     },
