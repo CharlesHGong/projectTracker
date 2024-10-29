@@ -1,10 +1,16 @@
-import React, { useState } from "react";
-import { Popover, Input, Button } from "antd";
-import { SendOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import { Popover, Input } from "antd";
 
 export const PopoverInput = ({ children, onConfirm }) => {
   const [visible, setVisible] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const inputRef = React.createRef();
+
+  useEffect(() => {
+    if (visible) {
+      setTimeout(() => inputRef.current.focus(), 100);
+    }
+  }, [visible]);
 
   const handleVisibleChange = (visible) => {
     setVisible(visible);
@@ -23,12 +29,12 @@ export const PopoverInput = ({ children, onConfirm }) => {
   const content = (
     <div style={{ display: "flex" }}>
       <Input
+        ref={inputRef}
         placeholder="Project Name"
         value={inputValue}
         onChange={handleInputChange}
         onPressEnter={handleSubmit}
       />
-      <Button type="primary" icon={<SendOutlined />} onClick={handleSubmit} />
     </div>
   );
 
@@ -36,8 +42,9 @@ export const PopoverInput = ({ children, onConfirm }) => {
     <Popover
       content={content}
       trigger="click"
-      visible={visible}
-      onVisibleChange={handleVisibleChange}
+      open={visible}
+      onOpenChange={handleVisibleChange}
+      destroyTooltipOnHide
     >
       {children}
     </Popover>

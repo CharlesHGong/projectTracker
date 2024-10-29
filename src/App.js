@@ -6,9 +6,11 @@ import { Button } from 'antd';
 import { PlusOutlined, CaretDownOutlined } from "@ant-design/icons";
 import { ProjectSelect } from './components/ProjectSelect';
 import { request } from './api';
+import { ProjectTracker } from './components/ProjectTracker';
 
 
 function App() {
+  const projects = usePageStore((state) => state.projects);
   return (
     <div className="widget">
       <div className="no-drag">
@@ -20,9 +22,10 @@ function App() {
         </ProjectSelect>
       </div>
 
-      <span className="no-drag">I'm a floating widget!</span>
-      <br />
-      <button className="no-drag" onClick={() => { const userInput = window.prompt("Please enter your name:"); }}>Click Me</button>
+
+      <div className="no-drag">
+        {projects.map(({ name }) => <ProjectTracker name={name} key={name} />)}
+      </div>
     </div>
   );
 }

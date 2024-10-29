@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Popover, Checkbox } from "antd";
+import { Popover, Checkbox, Button } from "antd";
 import { usePageStore } from "../store";
 
 export const ProjectSelect = ({ children }) => {
@@ -18,6 +18,7 @@ export const ProjectSelect = ({ children }) => {
   };
 
   const handleCheckboxChange = (projectName, checked) => {
+    const { selectedProjectNames } = usePageStore.getState();
     const updatedSelectedProjectNames = checked
       ? [...selectedProjectNames, projectName]
       : selectedProjectNames.filter((project) => project !== projectName);
@@ -38,6 +39,15 @@ export const ProjectSelect = ({ children }) => {
           </Checkbox>
         </div>
       ))}
+      <Button
+        type="primary"
+        onClick={() => {
+          usePageStore.getState().loadProjects();
+          setVisible(false);
+        }}
+      >
+        Confirm
+      </Button>
     </div>
   );
 
@@ -46,8 +56,9 @@ export const ProjectSelect = ({ children }) => {
       content={content}
       title="Select Projects"
       trigger="click"
-      visible={visible}
-      onVisibleChange={handleVisibleChange}
+      open={visible}
+      onOpenChange={handleVisibleChange}
+      destroyTooltipOnHide
     >
       {children}
     </Popover>

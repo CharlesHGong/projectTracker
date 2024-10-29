@@ -17,9 +17,9 @@ export const createProject = async (name) => {
   return;
 };
 
-export const addLog = async (projectName, log) => {
+export const addLog = async ({ name, log }) => {
   const db = await loadDb();
-  const project = db.data.projects.find((project) => project.name === projectName);
+  const project = db.data.projects.find((project) => project.name === name);
   project.logs.push(log);
   await db.write();
   return;
