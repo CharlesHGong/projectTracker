@@ -13,7 +13,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // });
 
 let mainWindow;
-console.log('path', path.join(__dirname, 'preload.js'));
 app.on('ready', () => {
   mainWindow = new BrowserWindow({
     width: 200,
@@ -30,11 +29,11 @@ app.on('ready', () => {
     },
   });
 
-  // mainWindow.loadFile('public/index.html');
-  // mainWindow.on('ready-to-show', () => {
-  //   mainWindow.show();
-  // });
-  mainWindow.loadURL('http://localhost:3000'); // Load from dev server for hot reload
+  mainWindow.loadFile('public/index.html');
+  mainWindow.on('ready-to-show', () => {
+    mainWindow.show();
+  });
+  // mainWindow.loadURL('http://localhost:3000'); // Load from dev server for hot reload
 
   // Handle message from renderer
   ipcMain.on('request', async (event, data) => {
