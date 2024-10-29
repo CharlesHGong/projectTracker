@@ -1,0 +1,17 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.widget {
+  padding: 10px;
+  text-align: center;
+  background-color: rgba(50, 50, 50, 0.8);
+  color: white;
+  border-radius: 8px;
+  -webkit-app-region: drag; /* Makes the widget draggable */
+}
+
+.no-drag {
+  -webkit-app-region: no-drag; /* Prevents dragging for specific elements */
+}
