@@ -22,11 +22,13 @@ export const usePageStore = create((set, get) => ({
   },
   loadProjects: async () => {
     const { selectedProjectNames } = get();
+    request({ method: 'updateDisplayingProjectNames', payload: selectedProjectNames });
     const projects = await request({ method: 'getProjects', payload: selectedProjectNames });
     set({ projects });
   },
   getProjectNames: async () => {
-    const projectNames = await request({ method: 'getProjectNames' });
-    set({ projectNames });
+    const { projectNames, selectedProjectNames } = await request({ method: 'getProjectNames' });
+    set({ projectNames, selectedProjectNames });
+    get().loadProjects();
   },
 }));

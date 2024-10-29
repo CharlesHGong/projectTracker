@@ -1,4 +1,4 @@
-import { createProject, addLog, getProjectNames, getProjects } from './db.mjs';
+import { createProject, addLog, getProjectNames, getProjects, updateDisplayingProjectNames } from './db.mjs';
 
 export const handleRequest = async (data) => {
   const { method, payload, id } = data;
@@ -16,6 +16,8 @@ const getResponse = (method, payload) => {
       return getProjects(payload);
     case 'getProjectNames':
       return getProjectNames();
+    case 'updateDisplayingProjectNames':
+      return updateDisplayingProjectNames(payload);
     default:
       return 'Invalid method';
   }

@@ -4,9 +4,6 @@ import { usePageStore } from "../store";
 
 export const ProjectSelect = ({ children }) => {
   const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    usePageStore.getState().getProjectNames();
-  }, []);
 
   const projectNames = usePageStore((state) => state.projectNames);
   const selectedProjectNames = usePageStore(

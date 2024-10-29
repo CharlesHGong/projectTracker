@@ -2,6 +2,7 @@ import { JSONFilePreset } from 'lowdb/node';
 
 const defaultDb = {
   projects: [],
+  displayingProjectNames: [],
 };
 
 const loadDb = async () => {
@@ -32,5 +33,14 @@ export const getProjects = async (projectNames) => {
 
 export const getProjectNames = async () => {
   const db = await loadDb();
-  return db.data.projects.map((project) => project.name);
+  const projectNames = db.data.projects.map((project) => project.name);
+  const selectedProjectNames = db.data.displayingProjectNames;
+  return { projectNames, selectedProjectNames };
+}
+
+export const updateDisplayingProjectNames = async (selectedProjectNames) => {
+  const db = await loadDb();
+  db.data.displayingProjectNames = selectedProjectNames;
+  await db.write();
+  return;
 }

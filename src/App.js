@@ -11,10 +11,22 @@ import { ProjectTracker } from './components/ProjectTracker';
 
 function App() {
   const projects = usePageStore((state) => state.projects);
+
+  useEffect(() => {
+    usePageStore.getState().getProjectNames();
+  }, []);
+
   return (
     <div className="widget">
       <div className="no-drag">
-        <PopoverInput onConfirm={(inputValue) => { request({ method: 'createProject', payload: inputValue }) }}>
+        <PopoverInput onConfirm={async (inputValue) => {
+          await request({ method: 'createProject', payload: inputValue })
+          usePageStore.setState({
+            projectNames: [...usePageStore.getState().projectNames, inputValue],
+            selectedProjectNames: [...usePageStore.getState().selectedProjectNames, inputValue]
+          });
+          usePageStore.getState().loadProjects();
+        }}>
           <Button icon={<PlusOutlined />} size="small" />
         </PopoverInput>
         <ProjectSelect onConfirm={(inputValue) => { console.log(inputValue); }}>
