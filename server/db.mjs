@@ -1,4 +1,7 @@
 import { JSONFilePreset } from 'lowdb/node';
+import { app } from 'electron';
+
+const APP_NAME = 'projectTimeTracker';
 
 const defaultDb = {
   projects: [],
@@ -6,7 +9,7 @@ const defaultDb = {
 };
 
 const loadDb = async () => {
-  const db = await JSONFilePreset("db.json", defaultDb);
+  const db = await JSONFilePreset(`${app.getPath('appData')}/${APP_NAME}/db.json`, defaultDb);
   db.read();
   return db;
 };
