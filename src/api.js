@@ -11,9 +11,9 @@ const makeWorkerApi = () => {
 
   window.electronAPI?.receiveMessage('response', (response) => {
     const { id, data } = response;
-    const { resolve, reject } = pendingRequests[id];
+    const { resolve, reject } = pendingRequests[id] ?? { resolve: undefined, reject: undefined };
     delete pendingRequests[id];
-    resolve(data);
+    resolve?.(data);
   });
 
   return { request };

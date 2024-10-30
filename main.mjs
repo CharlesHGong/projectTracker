@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 let tray = null;
+const mode = process.env.MODE || 'production';
 
 // Use electron-reload to watch for changes in Electron files
 // electronReload(__dirname, {
@@ -34,27 +35,30 @@ app.on('ready', () => {
     },
   });
 
-  mainWindow.loadFile('public/index.html');
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show();
-  });
-  // mainWindow.loadURL('http://localhost:3000'); // Load from dev server for hot reload
+  if (mode === 'production') {
+    mainWindow.loadFile('dist/index.html');
+    mainWindow.on('ready-to-show', () => {
+      mainWindow.show();
+    });
+  } else {
+    mainWindow.loadURL('http://localhost:3000'); // Load from dev server for hot reload
+  }
 
-  // Create the Tray icon
-  tray = new Tray(path.join(__dirname, 'public/icon.png')); // Use a path to your tray icon
-  const contextMenu = Menu.buildFromTemplate([
-    { label: 'Show', click: () => mainWindow.show() },
-    { label: 'Hide', click: () => mainWindow.hide() },
-    { label: 'Quit', click: () => app.quit() },
-  ]);
-
-  tray.setToolTip('Project Time Tracker');
-  tray.setContextMenu(contextMenu);
-
-  // Show the window when the tray icon is clicked
-  tray.on('click', () => {
-    mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
-  });
+  if (process.platform !== 'darwin') {
+    // Create the Tray icon
+    tray = new Tray(path.join(__dirname, 'public/icon.png')); // Use a path to your tray icon
+    const contextMenu = Menu.buildFromTemplate([
+      { label: 'Show', click: () => mainWindow.show() },
+      { label: 'Hide', click: () => mainWindow.hide() },
+      { label: 'Quit', click: () => app.quit() },
+    ]);
+    tray.setToolTip('Project Time Tracker');
+    tray.setContextMenu(contextMenu);
+    // Show the window when the tray icon is clicked
+    tray.on('click', () => {
+      mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
+    });
+  }
 
   // Handle message from renderer
   ipcMain.on('request', async (event, data) => {
