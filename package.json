@@ -15,7 +15,7 @@
     "appId": "com.charles-gong.projecttimetracker",
     "productName": "Project Time Tracker",
     "directories": {
-      "output": "dist"
+      "output": "app"
     },
     "win": {
       "target": "portable"
