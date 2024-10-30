@@ -38,6 +38,7 @@ export const ProjectPage = ({ name }) => {
       <div className="no-drag" style={{ textAlign: "right" }}>
         <Select
           popupClassName="no-drag"
+          size="small"
           value={groupBy}
           style={{ width: 80 }}
           onChange={(v) => setGroupBy(v)}

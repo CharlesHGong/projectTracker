@@ -12,8 +12,9 @@ export const Header = () => {
       style={{
         width: "100%",
         display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr",
+        gridTemplateColumns: "50px 1fr 50px",
         marginBottom: 10,
+        alignItems: "center",
       }}
     >
       <div />

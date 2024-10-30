@@ -5,7 +5,9 @@ import { InfoCircleOutlined } from "@ant-design/icons";
 import { formatTime } from "../utils/dateUtils";
 
 export const ProjectTracker = ({ name }) => {
-  const [now, setNow] = useState(Date.now());
+  const now = usePageStore((state) =>
+    state.workingProjectName === name ? state.now : undefined
+  );
   const startTime = usePageStore((state) =>
     state.workingProjectName === name ? state.startTime : undefined
   );
@@ -22,14 +24,7 @@ export const ProjectTracker = ({ name }) => {
 
   const handleClick = () => {
     const { handleStartOrStop } = usePageStore.getState();
-    if (startTime) {
-      handleStartOrStop(name, undefined);
-    } else {
-      const timeInterValRef = setInterval(() => {
-        setNow(Date.now());
-      }, 1000);
-      handleStartOrStop(name, timeInterValRef);
-    }
+    handleStartOrStop(name, !Boolean(startTime));
   };
 
   return (
@@ -40,6 +35,7 @@ export const ProjectTracker = ({ name }) => {
         display: "grid",
         gridTemplateColumns: "1fr 1fr 1fr",
         gap: "10px",
+        alignItems: "baseline",
       }}
     >
       <span style={{ textAlign: "left" }}>

@@ -7,7 +7,7 @@ const defaultDb = {
   projects: [],
   displayingProjectNames: [],
 };
-
+console.log('db location', `${app.getPath('appData')}/${APP_NAME}/db.json`);
 const loadDb = async () => {
   const db = await JSONFilePreset(`${app.getPath('appData')}/${APP_NAME}/db.json`, defaultDb);
   db.read();
