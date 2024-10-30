@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { usePageStore } from "../store";
 import { Button } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
 
 const formatTime = (totalTime) => {
   const hours = Math.floor(totalTime / 3600000);
@@ -49,7 +50,15 @@ export const ProjectTracker = ({ name }) => {
         gap: "10px",
       }}
     >
-      <span style={{ textAlign: "left" }}>{name}</span>
+      <span style={{ textAlign: "left" }}>
+        <Button
+          icon={<InfoCircleOutlined />}
+          size="small"
+          type="link"
+          onClick={() => usePageStore.setState({ page: `project/${name}` })}
+        />
+        {name}
+      </span>
       <span>{formatTime(totalTime)}</span>
       <Button
         size="small"

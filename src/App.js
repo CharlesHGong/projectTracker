@@ -1,24 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import './App.css';
 import { usePageStore } from './store';
-import { ProjectTracker } from './components/ProjectTracker';
-import { Header } from './components/Header';
+import { HomePage } from './pages/Home';
+import { ProjectPage } from './pages/Project';
 
 
 function App() {
-  const projects = usePageStore((state) => state.projects);
-
-  useEffect(() => {
-    usePageStore.getState().getProjectNames();
-  }, []);
+  const page = usePageStore((state) => state.page);
 
   return (
-    <div className="widget">
-      <Header />
-      <div className="no-drag">
-        {projects.map(({ name }) => <ProjectTracker name={name} key={name} />)}
-      </div>
-    </div>
+    page === 'home' ? <HomePage /> : <ProjectPage name={page.slice('project/'.length)} />
   );
 }
 
