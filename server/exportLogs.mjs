@@ -1,4 +1,4 @@
-import { formatTime, getStartOfWeek } from "./dateUtils.mjs";
+import { getStartOfWeek } from "./dateUtils.mjs";
 import { getLogsBetweenDates } from "./db.mjs";
 import { app } from 'electron';
 import fs from 'fs';
