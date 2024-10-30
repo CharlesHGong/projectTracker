@@ -10,7 +10,6 @@ export const formatTime = (totalTime) => {
 export function groupDatesByDay(logs) {
   const lmap = logs.reduce((acc, log) => {
     const day = new Date(log.startTime).toISOString().split("T")[0]; // Extract the date part in 'YYYY-MM-DD' format
-    console.log(day);
     if (!acc[day]) {
       acc[day] = 0;
     }

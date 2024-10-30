@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Popover, Checkbox, Button } from "antd";
+import React, { useState } from "react";
+import { Popover, Checkbox, Button, Divider } from "antd";
 import { usePageStore } from "../store";
+import { request } from "../api";
 
 export const ProjectSelect = ({ children }) => {
   const [visible, setVisible] = useState(false);
@@ -44,8 +45,20 @@ export const ProjectSelect = ({ children }) => {
           usePageStore.getState().loadProjects();
           setVisible(false);
         }}
+        block
       >
         Confirm
+      </Button>
+      <Divider style={{ margin: 4 }} />
+      <Button
+        onClick={async () => {
+          await request({ method: "exportLogs" });
+          window.alert("Logs exported successfully!");
+        }}
+        size="small"
+        block
+      >
+        Download
       </Button>
     </div>
   );

@@ -48,3 +48,11 @@ export const updateDisplayingProjectNames = async (selectedProjectNames) => {
   await db.write();
   return;
 }
+
+export const getLogsBetweenDates = async ({ startDate, endDate }) => {
+  const db = await loadDb();
+  const logs = db.data.projects.flatMap((project) => (
+    project.logs.filter((log) => log.startTime >= startDate && log.endTime <= endDate).map((log) => ({ ...log, projectName: project.name }))
+  ));
+  return logs;
+}
