@@ -2,15 +2,7 @@ import React, { useState } from "react";
 import { usePageStore } from "../store";
 import { Button } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
-
-const formatTime = (totalTime) => {
-  const hours = Math.floor(totalTime / 3600000);
-  const minutes = Math.floor((totalTime % 3600000) / 60000);
-  const seconds = Math.floor((totalTime % 60000) / 1000);
-  return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds
-    .toString()
-    .padStart(2, "0")}`;
-};
+import { formatTime } from "../utils/dateUtils";
 
 export const ProjectTracker = ({ name }) => {
   const [now, setNow] = useState(Date.now());
