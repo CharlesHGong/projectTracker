@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { usePageStore } from "../store";
 import { Button } from "antd";
 import { LeftSquareOutlined } from "@ant-design/icons";
+import { PopoverDateRangePicker } from "../components/PopoverDateRangePicker";
+import { PlusOutlined } from "@ant-design/icons";
 
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString("en-US");
@@ -31,14 +33,24 @@ export const ProjectPage = ({ name }) => {
           justifyContent: "center",
         }}
       >
-        <div className="no-drag" style={{ textAlign: "left" }}>
+        <div style={{ textAlign: "left" }}>
           <Button
+            className="no-drag"
             icon={<LeftSquareOutlined />}
             onClick={() => usePageStore.setState({ page: "home" })}
             size="small"
           />
         </div>
         <div style={{ textAlign: "center" }}>{name}</div>
+        <div style={{ textAlign: "right" }}>
+          <PopoverDateRangePicker
+            onConfirm={async (range) => {
+              usePageStore.getState().addLog(name, range[0], range[1]);
+            }}
+          >
+            <Button className="no-drag" icon={<PlusOutlined />} size="small" />
+          </PopoverDateRangePicker>
+        </div>
       </div>
       <div style={{ textAlign: "center" }}>
         {project?.logs.map(({ startTime, endTime }) => (

@@ -25,7 +25,7 @@ export const ProjectSelect = ({ children }) => {
   };
 
   const content = (
-    <div>
+    <div className="no-drag">
       <div>Selected Projects</div>
       {projectNames.map((project) => (
         <div key={project} style={{ marginBottom: "8px" }}>

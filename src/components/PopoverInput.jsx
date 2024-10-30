@@ -27,7 +27,7 @@ export const PopoverInput = ({ children, onConfirm }) => {
   };
 
   const content = (
-    <div style={{ display: "flex" }}>
+    <div className="no-drag" style={{ display: "flex" }}>
       <Input
         ref={inputRef}
         placeholder="Project Name"

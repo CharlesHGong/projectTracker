@@ -21,3 +21,7 @@ body {
 .no-drag {
   -webkit-app-region: no-drag; /* Prevents dragging for specific elements */
 }
+
+.ant-picker-dropdown {
+  -webkit-app-region: no-drag; /* Prevents dragging for specific elements */
+}

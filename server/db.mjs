@@ -22,6 +22,7 @@ export const addLog = async ({ name, log }) => {
   const db = await loadDb();
   const project = db.data.projects.find((project) => project.name === name);
   project.logs.push(log);
+  project.logs.sort((a, b) => a.startTime - b.startTime);
   await db.write();
   return;
 }

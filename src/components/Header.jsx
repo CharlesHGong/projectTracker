@@ -17,7 +17,7 @@ export const Header = () => {
       }}
     >
       <div />
-      <div>Project Tracker</div>
+      <div style={{ textAlign: "center" }}>Project Tracker</div>
       <div className="no-drag" style={{ textAlign: "right" }}>
         <PopoverInput
           onConfirm={async (inputValue) => {

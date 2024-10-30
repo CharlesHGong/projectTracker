@@ -14,9 +14,11 @@ export const usePageStore = create((set, get) => ({
     set({
       projects: get().projects.map((project) => {
         if (project.name === name) {
+          const newLogs = [...project.logs, { startTime, endTime }];
+          newLogs.sort((a, b) => a.startTime - b.startTime);
           return {
             ...project,
-            logs: [...project.logs, { startTime, endTime }]
+            logs: newLogs
           }
         }
         return project;

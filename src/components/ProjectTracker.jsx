@@ -59,7 +59,7 @@ export const ProjectTracker = ({ name }) => {
         />
         {name}
       </span>
-      <span>{formatTime(totalTime)}</span>
+      <span style={{ textAlign: "center" }}>{formatTime(totalTime)}</span>
       <Button
         size="small"
         onClick={handleClick}
