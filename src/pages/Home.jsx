@@ -7,13 +7,15 @@ import { rangeLabelMap } from "../components/HomeMenuDropdown";
 
 export const HomePage = () => {
   const projects = usePageStore((state) => state.projects);
-  const totalTime = usePageStore((state) =>
-    formatTime(
-      state.projects
-        .flatMap((p) => p.logs)
-        .reduce((acc, log) => log.endTime - log.startTime + acc, 0)
-    )
+  const previousTime = usePageStore((state) =>
+    state.projects
+      .flatMap((p) => p.logs)
+      .reduce((acc, log) => log.endTime - log.startTime + acc, 0)
   );
+  const currentTime = usePageStore((state) =>
+    state.now && state.startTime ? state.now - state.startTime : 0
+  );
+  const totalTime = formatTime(previousTime + currentTime);
   const range = usePageStore((state) => state.range);
 
   useEffect(() => {
