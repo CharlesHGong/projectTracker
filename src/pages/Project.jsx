@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { usePageStore } from "../store";
 import { Button, Select } from "antd";
 import { LeftSquareOutlined } from "@ant-design/icons";
@@ -10,6 +10,7 @@ import {
   groupDatesByMonth,
   groupDatesByWeek,
 } from "../utils/dateUtils";
+import { request } from "../api";
 
 const getGroups = (logs, groupBy) => {
   switch (groupBy) {
@@ -26,15 +27,21 @@ const getGroups = (logs, groupBy) => {
 
 export const ProjectPage = ({ name }) => {
   const [groupBy, setGroupBy] = useState("day");
-  const project = usePageStore((state) =>
-    state.projects.find((project) => project.name === name)
-  );
+  const [project, setProject] = useState(null);
 
-  const logsGrouped = getGroups(project.logs, groupBy);
+  const loadProject = useCallback(async () => {
+    const project = await request({ method: "getProject", payload: name });
+    setProject(project);
+  }, [name]);
+  useEffect(() => {
+    loadProject();
+  }, [loadProject]);
+
+  const logsGrouped = project ? getGroups(project.logs, groupBy) : [];
 
   return (
     <div className="widget">
-      <Header name={name} />
+      <Header name={name} loadProject={loadProject} />
       <div className="no-drag" style={{ textAlign: "right" }}>
         <Select
           popupClassName="no-drag"
@@ -61,7 +68,7 @@ export const ProjectPage = ({ name }) => {
   );
 };
 
-const Header = ({ name }) => {
+const Header = ({ name, loadProject }) => {
   return (
     <div
       style={{
@@ -84,7 +91,8 @@ const Header = ({ name }) => {
       <div style={{ textAlign: "right" }}>
         <PopoverDateRangePicker
           onConfirm={async (range) => {
-            usePageStore.getState().addLog(name, range[0], range[1]);
+            await usePageStore.getState().addLog(name, range[0], range[1]);
+            loadProject();
           }}
         >
           <Button className="no-drag" icon={<PlusOutlined />} size="small" />

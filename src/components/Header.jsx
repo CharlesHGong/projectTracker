@@ -3,8 +3,8 @@ import { usePageStore } from "../store";
 import { PopoverInput } from "./PopoverInput";
 import { Button } from "antd";
 import { PlusOutlined, CaretDownOutlined } from "@ant-design/icons";
-import { ProjectSelect } from "./ProjectSelect";
 import { request } from "../api";
+import { HomeMenuDropdown } from "./HomeMenuDropdown";
 
 export const Header = () => {
   return (
@@ -38,13 +38,9 @@ export const Header = () => {
         >
           <Button icon={<PlusOutlined />} size="small" />
         </PopoverInput>
-        <ProjectSelect
-          onConfirm={(inputValue) => {
-            console.log(inputValue);
-          }}
-        >
+        <HomeMenuDropdown>
           <Button icon={<CaretDownOutlined />} size="small" />
-        </ProjectSelect>
+        </HomeMenuDropdown>
       </div>
     </div>
   );

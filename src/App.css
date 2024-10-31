@@ -10,6 +10,7 @@ body {
 
 .widget {
   height: 100%;
+  overflow-x: hidden;
   padding: 10px;
   background-color: rgba(50, 50, 50, 0.8);
   color: white;

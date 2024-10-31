@@ -3,6 +3,7 @@ import { request } from "./api";
 
 export const usePageStore = create((set, get) => ({
   page: 'home',
+  range: 'day',
   startTime: undefined,
   now: undefined,
   workingProjectName: '',
@@ -27,9 +28,9 @@ export const usePageStore = create((set, get) => ({
     });
   },
   loadProjects: async () => {
-    const { selectedProjectNames } = get();
+    const { selectedProjectNames, range } = get();
     request({ method: 'updateDisplayingProjectNames', payload: selectedProjectNames });
-    const projects = await request({ method: 'getProjects', payload: selectedProjectNames });
+    const projects = await request({ method: 'getProjects', payload: { projectNames: selectedProjectNames, range } });
     set({ projects });
   },
   getProjectNames: async () => {

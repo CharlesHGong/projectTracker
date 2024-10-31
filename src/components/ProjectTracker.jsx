@@ -34,12 +34,12 @@ export const ProjectTracker = ({ name }) => {
         width: "100%",
         display: "grid",
         gridTemplateColumns: "1fr 1fr 1fr",
-        gap: "10px",
         alignItems: "baseline",
       }}
     >
       <span style={{ textAlign: "left" }}>
         <Button
+          className="no-drag"
           icon={<InfoCircleOutlined />}
           size="small"
           type="link"
@@ -49,6 +49,7 @@ export const ProjectTracker = ({ name }) => {
       </span>
       <span style={{ textAlign: "center" }}>{formatTime(totalTime)}</span>
       <Button
+        className="no-drag"
         size="small"
         onClick={handleClick}
         variant="solid"

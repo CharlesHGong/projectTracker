@@ -1,0 +1,92 @@
+import React, { useMemo, useState } from "react";
+import { Checkbox, Dropdown } from "antd";
+import { usePageStore } from "../store";
+import { request } from "../api";
+
+const primaryColorStyle = {
+  background: "#1989fa",
+  color: "#fff",
+};
+
+export const rangeLabelMap = {
+  day: "Today",
+  week: "This Week",
+  all: "All",
+};
+
+export const HomeMenuDropdown = ({ children }) => {
+  const [open, setOpen] = useState(false);
+  const projectNames = usePageStore((state) => state.projectNames);
+  const range = usePageStore((state) => state.range);
+  const selectedProjectNames = usePageStore(
+    (state) => state.selectedProjectNames
+  );
+
+  const menuItems = useMemo(() => {
+    const projectsMenu = {
+      key: "projects",
+      label: "Projects",
+      popupClassName: "no-drag",
+      children: [
+        ...projectNames.map((name) => ({
+          key: `projects-${name}`,
+          label: name,
+          extra: <Checkbox checked={selectedProjectNames.includes(name)} />,
+        })),
+      ],
+    };
+
+    const timeRangeMenu = {
+      key: "timeRange",
+      label: "Time Range",
+      popupClassName: "no-drag",
+      children: Object.entries(rangeLabelMap).map(([k, v]) => ({
+        key: `range-${k}`,
+        label: v,
+        extra: k === range && <span style={{ color: "#1989fa" }}>✓</span>,
+      })),
+    };
+    const downloadMenu = {
+      key: "download",
+      label: "Download",
+      style: primaryColorStyle,
+    };
+    return [projectsMenu, timeRangeMenu, downloadMenu];
+  }, [projectNames, selectedProjectNames, range]);
+
+  const handleSelect = async ({ key }) => {
+    if (key === "download") {
+      await request({ method: "exportLogs" });
+      window.alert("Logs exported successfully!");
+    } else if (key.startsWith("projects")) {
+      const projectName = key.split("-")[1];
+      const isInsert = !selectedProjectNames.includes(projectName);
+      const updatedSelectedProjectNames = isInsert
+        ? [...selectedProjectNames, projectName]
+        : selectedProjectNames.filter((project) => project !== projectName);
+      usePageStore.setState({
+        selectedProjectNames: updatedSelectedProjectNames,
+      });
+      usePageStore.getState().loadProjects();
+    } else if (key.startsWith("range")) {
+      usePageStore.setState({ range: key.split("-")[1] });
+      usePageStore.getState().loadProjects();
+    }
+  };
+
+  return (
+    <Dropdown
+      open={open}
+      onOpenChange={setOpen}
+      placement="bottomRight"
+      trigger={["click"]}
+      overlayClassName="no-drag"
+      menu={{
+        items: menuItems,
+        onClick: (e) => handleSelect(e),
+      }}
+    >
+      {children}
+    </Dropdown>
+  );
+};

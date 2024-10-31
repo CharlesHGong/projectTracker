@@ -1,5 +1,6 @@
 import { JSONFilePreset } from 'lowdb/node';
 import { app } from 'electron';
+import { getStartOfRange } from './dateUtils.mjs';
 
 const APP_NAME = 'projectTimeTracker';
 
@@ -30,9 +31,17 @@ export const addLog = async ({ name, log }) => {
   return;
 }
 
-export const getProjects = async (projectNames) => {
+export const getProjects = async ({ projectNames, range }) => {
   const db = await loadDb();
-  return db.data.projects.filter((project) => projectNames.includes(project.name));
+  const lowerBound = getStartOfRange(Date.now(), range);
+  return db.data.projects
+    .filter((project) => projectNames.includes(project.name))
+    .map(p => ({ ...p, logs: p.logs.filter((log) => log.startTime >= lowerBound) }));
+}
+
+export const getProject = async (name) => {
+  const db = await loadDb();
+  return db.data.projects.find((project) => project.name === name);
 }
 
 export const getProjectNames = async () => {

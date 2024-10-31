@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 
 export const exportLogs = async () => {
-  const logs = await getLogsBetweenDates({ startDate: new Date(getStartOfWeek(Date.now())).getTime(), endDate: Date.now() });
+  const logs = await getLogsBetweenDates({ startDate: getStartOfWeek(Date.now()), endDate: Date.now() });
   const groups = groupDatesByDay(logs);
   groups.sort((a, b) => {
     if (a.start !== b.start) {
