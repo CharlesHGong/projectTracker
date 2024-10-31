@@ -23,7 +23,7 @@ export const HomePage = () => {
   }, []);
 
   return (
-    <div className="widget">
+    <>
       <div
         style={{
           height: "100%",
@@ -53,6 +53,6 @@ export const HomePage = () => {
           <div />
         </div>
       </div>
-    </div>
+    </>
   );
 };

@@ -7,9 +7,12 @@ import { ProjectPage } from './pages/Project';
 
 function App() {
   const page = usePageStore((state) => state.page);
+  const bgAlpha = usePageStore((state) => state.bgAlpha);
 
   return (
-    page === 'home' ? <HomePage /> : <ProjectPage name={page.slice('project/'.length)} />
+    <div style={{ backgroundColor: `rgba(50, 50, 50, ${bgAlpha})` }} className='widget'>
+      {page === 'home' ? <HomePage /> : <ProjectPage name={page.slice('project/'.length)} />}
+    </div>
   );
 }
 

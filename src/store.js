@@ -4,6 +4,11 @@ import { request } from "./api";
 export const usePageStore = create((set, get) => ({
   page: 'home',
   range: 'day',
+  bgAlpha: parseFloat(localStorage.getItem('bgAlpha') ?? 0.8),
+  setBgAlpha: (a) => {
+    set({ bgAlpha: a });
+    localStorage.setItem('bgAlpha', a);
+  },
   startTime: undefined,
   now: undefined,
   workingProjectName: '',

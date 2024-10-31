@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Checkbox, Dropdown } from "antd";
+import { Checkbox, Dropdown, Slider } from "antd";
 import { usePageStore } from "../store";
 import { request } from "../api";
 
@@ -12,6 +12,20 @@ export const rangeLabelMap = {
   day: "Today",
   week: "This Week",
   all: "All",
+};
+
+const TransparencySlider = () => {
+  const bgAlpha = usePageStore((s) => s.bgAlpha);
+  return (
+    <Slider
+      value={bgAlpha}
+      max={1}
+      min={0.1}
+      style={{ width: 100 }}
+      step={0.1}
+      onChange={(e) => usePageStore.getState().setBgAlpha(e)}
+    />
+  );
 };
 
 export const HomeMenuDropdown = ({ children }) => {
@@ -51,7 +65,19 @@ export const HomeMenuDropdown = ({ children }) => {
       label: "Download",
       style: primaryColorStyle,
     };
-    return [projectsMenu, timeRangeMenu, downloadMenu];
+    const bgAlpha = {
+      key: "bgAlpha",
+      label: "Transparency",
+      popupClassName: "no-drag",
+      children: [
+        {
+          key: "bgAlpha",
+          label: "",
+          icon: <TransparencySlider />,
+        },
+      ],
+    };
+    return [projectsMenu, timeRangeMenu, bgAlpha, downloadMenu];
   }, [projectNames, selectedProjectNames, range]);
 
   const handleSelect = async ({ key }) => {
@@ -84,6 +110,7 @@ export const HomeMenuDropdown = ({ children }) => {
       menu={{
         items: menuItems,
         onClick: (e) => handleSelect(e),
+        triggerSubMenuAction: "click",
       }}
     >
       {children}

@@ -40,7 +40,7 @@ export const ProjectPage = ({ name }) => {
   const logsGrouped = project ? getGroups(project.logs, groupBy) : [];
 
   return (
-    <div className="widget">
+    <>
       <Header name={name} loadProject={loadProject} />
       <div className="no-drag" style={{ textAlign: "right" }}>
         <Select
@@ -64,7 +64,7 @@ export const ProjectPage = ({ name }) => {
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 };
 
