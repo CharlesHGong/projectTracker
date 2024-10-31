@@ -52,5 +52,11 @@ export const usePageStore = create((set, get) => ({
       addLog(name, startTime, Date.now());
       set({ startTime: undefined, now: undefined, workingProjectName: '', timeIntervalRef: undefined });
     }
+  },
+  updateName: async (name, newName) => {
+    const { selectedProjectNames, loadProjects } = get();
+    await request({ method: 'updateProject', payload: { name, project: { name: newName } } });
+    set({ page: `project/${newName}`, selectedProjectNames: selectedProjectNames.filter((pn) => pn !== name).concat(newName) });
+    loadProjects();
   }
 }));

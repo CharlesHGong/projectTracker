@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { usePageStore } from "../store";
-import { Button, Select } from "antd";
+import { Button, Input, Select } from "antd";
 import { LeftSquareOutlined } from "@ant-design/icons";
 import { PopoverDateRangePicker } from "../components/PopoverDateRangePicker";
 import { PlusOutlined } from "@ant-design/icons";
@@ -69,6 +69,8 @@ export const ProjectPage = ({ name }) => {
 };
 
 const Header = ({ name, loadProject }) => {
+  const [edit, setEdit] = useState(false);
+  const [newName, setNewName] = useState(name);
   return (
     <div
       style={{
@@ -77,6 +79,7 @@ const Header = ({ name, loadProject }) => {
         gridTemplateColumns: "1fr 1fr 1fr",
         marginBottom: 10,
         justifyContent: "center",
+        alignItems: "center",
       }}
     >
       <div style={{ textAlign: "left" }}>
@@ -87,8 +90,25 @@ const Header = ({ name, loadProject }) => {
           size="small"
         />
       </div>
-      <div style={{ textAlign: "center" }}>{name}</div>
-      <div style={{ textAlign: "right" }}>
+      <div style={{ textAlign: "center" }}>
+        {edit ? (
+          <Input
+            className="no-drag"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            style={{ textAlign: "center", padding: 0 }}
+          />
+        ) : (
+          name
+        )}
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-end",
+        }}
+      >
         <PopoverDateRangePicker
           onConfirm={async (range) => {
             await usePageStore.getState().addLog(name, range[0], range[1]);
@@ -97,6 +117,20 @@ const Header = ({ name, loadProject }) => {
         >
           <Button className="no-drag" icon={<PlusOutlined />} size="small" />
         </PopoverDateRangePicker>
+        <Button
+          className="no-drag"
+          size="small"
+          onClick={() =>
+            setEdit((edit) => {
+              if (edit) {
+                usePageStore.getState().updateName(name, newName);
+              }
+              return !edit;
+            })
+          }
+        >
+          {edit ? "Save" : "Edit"}
+        </Button>
       </div>
     </div>
   );

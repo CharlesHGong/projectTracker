@@ -44,6 +44,13 @@ export const getProject = async (name) => {
   return db.data.projects.find((project) => project.name === name);
 }
 
+export const updateProject = async ({ name, project }) => {
+  const db = await loadDb();
+  db.data.projects = db.data.projects.map((p) => p.name === name ? { ...p, ...project } : p);
+  await db.write();
+  return;
+}
+
 export const getProjectNames = async () => {
   const db = await loadDb();
   const projectNames = db.data.projects.map((project) => project.name);
