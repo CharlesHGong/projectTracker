@@ -42,7 +42,7 @@ export function getStartOfWeek(date) {
 export function groupDatesByMonth(logs) {
   const lmap = logs.reduce((acc, log) => {
     const mDate = new Date(log.startTime);
-    const month = `${mDate.getFullYear()}-${(mDate.getMonth() + 1).toString().padStart(2, "0")}`; // Extract 'YYYY-MM' part
+    const month = `${(mDate.getMonth() + 1).toString().padStart(2, "0")}/${mDate.getFullYear()}`; // Extract 'YYYY-MM' part
     if (!acc[month]) {
       acc[month] = 0;
     }
