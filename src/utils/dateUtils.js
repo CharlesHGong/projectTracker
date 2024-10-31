@@ -9,7 +9,7 @@ export const formatTime = (totalTime) => {
 
 export function groupDatesByDay(logs) {
   const lmap = logs.reduce((acc, log) => {
-    const day = new Date(log.startTime).toISOString().split("T")[0]; // Extract the date part in 'YYYY-MM-DD' format
+    const day = new Date(log.startTime).toLocaleDateString("en-US");
     if (!acc[day]) {
       acc[day] = 0;
     }
@@ -36,12 +36,13 @@ export function getStartOfWeek(date) {
   const dayOfWeek = day.getDay(); // Get day of the week (0 = Sunday, 1 = Monday, etc.)
   const diff = day.getDate() - dayOfWeek;
   day.setDate(diff);
-  return day.toISOString().split('T')[0]; // Return 'YYYY-MM-DD' format of the week's start date
+  return day.toLocaleDateString("en-US");
 }
 
 export function groupDatesByMonth(logs) {
   const lmap = logs.reduce((acc, log) => {
-    const month = new Date(log.startTime).toISOString().slice(0, 7); // Extract 'YYYY-MM' part
+    const mDate = new Date(log.startTime);
+    const month = `${mDate.getFullYear()}-${(mDate.getMonth() + 1).toString().padStart(2, "0")}`; // Extract 'YYYY-MM' part
     if (!acc[month]) {
       acc[month] = 0;
     }

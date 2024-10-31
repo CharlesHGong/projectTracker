@@ -4,8 +4,9 @@ import { app } from 'electron';
 import fs from 'fs';
 import path from 'path';
 
+const week = 1000 * 60 * 60 * 24 * 7;
 export const exportLogs = async () => {
-  const logs = await getLogsBetweenDates({ startDate: getStartOfWeek(Date.now()), endDate: Date.now() });
+  const logs = await getLogsBetweenDates({ startDate: getStartOfWeek(Date.now()) - week, endDate: Date.now() });
   const groups = groupDatesByDay(logs);
   groups.sort((a, b) => {
     if (a.start !== b.start) {
@@ -31,7 +32,7 @@ function convertToCSV(groups) {
 const hoursInMs = 1000 * 60 * 60;
 export function groupDatesByDay(logs) {
   const lmap = logs.reduce((acc, log) => {
-    const day = new Date(log.startTime).toISOString().split("T")[0]; // Extract the date part in 'YYYY-MM-DD' format
+    const day = new Date(log.startTime).toLocaleDateString("en-US");
     const key = day + ':' + log.projectName;
     if (!acc[key]) {
       acc[key] = 0;
