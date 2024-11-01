@@ -55,6 +55,8 @@ export function groupDatesByMonth(logs) {
 export function groupByNone(logs) {
   return logs.map(({ startTime, endTime }) => ({
     start: `${new Date(startTime).toLocaleDateString("en-US")}-${new Date(startTime).toLocaleTimeString("en-US")}`,
-    time: formatTime(endTime - startTime)
+    time: formatTime(endTime - startTime),
+    startTime,
+    endTime,
   }));
 }

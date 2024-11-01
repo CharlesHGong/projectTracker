@@ -3,7 +3,12 @@ import { Popover, DatePicker, Button } from "antd";
 
 const { RangePicker } = DatePicker;
 
-export const PopoverDateRangePicker = ({ children, onConfirm }) => {
+export const PopoverDateRangePicker = ({
+  children,
+  onConfirm,
+  confirmText,
+  defaultValue,
+}) => {
   const [visible, setVisible] = useState(false);
   const [inputValue, setInputValue] = useState(undefined);
 
@@ -23,8 +28,14 @@ export const PopoverDateRangePicker = ({ children, onConfirm }) => {
 
   const content = (
     <div className="no-drag" style={{ display: "flex" }}>
-      <RangePicker showTime onChange={handleInputChange} />
-      <Button onClick={handleSubmit}>Add</Button>
+      <RangePicker
+        defaultValue={defaultValue}
+        showTime
+        onChange={handleInputChange}
+      />
+      <Button onClick={handleSubmit}>
+        {confirmText ? confirmText : "Add"}
+      </Button>
     </div>
   );
 

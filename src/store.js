@@ -32,6 +32,15 @@ export const usePageStore = create((set, get) => ({
       })
     });
   },
+  updateLog: async (project, previous, after) => {
+    const newProject = {
+      ...project,
+      logs: project.logs.map(l => l.startTime === previous.startTime && l.endTime === previous.endTime ? after : l)
+    }
+    await request({ method: 'updateProject', payload: { name: project.name, project: newProject } });
+    get().loadProjects();
+    return newProject;
+  },
   loadProjects: async () => {
     const { selectedProjectNames, range } = get();
     request({ method: 'updateDisplayingProjectNames', payload: selectedProjectNames });

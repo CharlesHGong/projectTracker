@@ -11,6 +11,7 @@ import {
   groupDatesByWeek,
 } from "../utils/dateUtils";
 import { request } from "../api";
+import dayjs from "dayjs";
 
 const getGroups = (logs, groupBy) => {
   switch (groupBy) {
@@ -26,7 +27,7 @@ const getGroups = (logs, groupBy) => {
 };
 
 export const ProjectPage = ({ name }) => {
-  const [groupBy, setGroupBy] = useState("day");
+  const [groupBy, setGroupBy] = useState("none");
   const [project, setProject] = useState(null);
 
   const loadProject = useCallback(async () => {
@@ -58,11 +59,43 @@ export const ProjectPage = ({ name }) => {
         />
       </div>
       <div style={{ textAlign: "center" }}>
-        {logsGrouped.map(({ start, time }) => (
-          <div key={start} style={{ margin: "4px 0" }}>
-            {start}: {time}
-          </div>
-        ))}
+        {logsGrouped.map(({ start, time, startTime, endTime }) =>
+          groupBy === "none" ? (
+            <div
+              key={start}
+              style={{
+                margin: "4px 0",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              {start}: {time}
+              <PopoverDateRangePicker
+                defaultValue={[dayjs(startTime), dayjs(endTime)]}
+                confirmText={"Save"}
+                onConfirm={async (range) => {
+                  const newProject = await usePageStore
+                    .getState()
+                    .updateLog(
+                      project,
+                      { startTime, endTime },
+                      { startTime: range[0], endTime: range[1] }
+                    );
+                  setProject(newProject);
+                }}
+              >
+                <Button size="small" className="no-drag">
+                  Edit
+                </Button>
+              </PopoverDateRangePicker>
+            </div>
+          ) : (
+            <div key={start} style={{ margin: "4px 0" }}>
+              {start}: {time}
+            </div>
+          )
+        )}
       </div>
     </>
   );
