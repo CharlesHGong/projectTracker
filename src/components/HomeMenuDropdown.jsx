@@ -71,7 +71,7 @@ export const HomeMenuDropdown = ({ children }) => {
       popupClassName: "no-drag",
       children: [
         {
-          key: "bgAlpha",
+          key: "bgAlpha-slider",
           label: "",
           icon: <TransparencySlider />,
         },

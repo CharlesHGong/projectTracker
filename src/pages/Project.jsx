@@ -73,7 +73,6 @@ export const ProjectPage = ({ name }) => {
               {start}: {time}
               <PopoverDateRangePicker
                 defaultValue={[dayjs(startTime), dayjs(endTime)]}
-                confirmText={"Save"}
                 onConfirm={async (range) => {
                   const newProject = await usePageStore
                     .getState()
@@ -147,6 +146,7 @@ const Header = ({ name, loadProject }) => {
             await usePageStore.getState().addLog(name, range[0], range[1]);
             loadProject();
           }}
+          confirmText={"Add"}
         >
           <Button className="no-drag" icon={<PlusOutlined />} size="small" />
         </PopoverDateRangePicker>

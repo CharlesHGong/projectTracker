@@ -17,7 +17,16 @@ export const PopoverDateRangePicker = ({
   };
 
   const handleInputChange = (range) => {
-    setInputValue([range[0].toDate().getTime(), range[1].toDate().getTime()]);
+    const inputValue = [
+      range[0].toDate().getTime(),
+      range[1].toDate().getTime(),
+    ];
+    setInputValue(inputValue);
+    if (!confirmText) {
+      onConfirm(inputValue);
+      setVisible(false);
+      setInputValue(undefined);
+    }
   };
 
   const handleSubmit = () => {
@@ -33,9 +42,7 @@ export const PopoverDateRangePicker = ({
         showTime
         onChange={handleInputChange}
       />
-      <Button onClick={handleSubmit}>
-        {confirmText ? confirmText : "Add"}
-      </Button>
+      {confirmText && <Button onClick={handleSubmit}>{confirmText}</Button>}
     </div>
   );
 
