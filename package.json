@@ -1,7 +1,7 @@
 {
   "name": "projecttimetracker",
   "description": "Project Time Tracker",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "main.mjs",
   "scripts": {
     "start:web": "webpack serve --config webpack.dev.js",
@@ -18,7 +18,8 @@
       "output": "app"
     },
     "win": {
-      "target": "portable"
+      "target": "portable",
+      "icon": "public/icon.png"
     }
   },
   "keywords": [],
