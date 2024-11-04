@@ -44,6 +44,7 @@ export const HomePage = () => {
             display: "grid",
             gridTemplateColumns: "1fr 1fr 1fr",
             alignItems: "baseline",
+            paddingLeft: "8px",
           }}
         >
           <div style={{ marginLeft: 16 }}>{rangeLabelMap[range]}</div>
