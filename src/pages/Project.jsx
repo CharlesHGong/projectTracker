@@ -72,7 +72,7 @@ export const ProjectPage = ({ name }) => {
             >
               {start}: {time}
               <PopoverDateRangePicker
-                defaultValue={[dayjs(startTime), dayjs(endTime)]}
+                defaultValue={[startTime, endTime]}
                 onConfirm={async (range) => {
                   const newProject = await usePageStore
                     .getState()
@@ -142,6 +142,7 @@ const Header = ({ name, loadProject }) => {
         }}
       >
         <PopoverDateRangePicker
+          defaultValue={[Date.now() - 1000 * 60 * 60, Date.now()]}
           onConfirm={async (range) => {
             await usePageStore.getState().addLog(name, range[0], range[1]);
             loadProject();
