@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { usePageStore } from "../store";
-import { ProjectTracker } from "../components/ProjectTracker";
 import { Header } from "../components/Header";
 import { formatTime } from "../utils/dateUtils";
 import { rangeLabelMap } from "../components/HomeMenuDropdown";
+import { ProjectList } from "../components/ProjectList";
 
 export const HomePage = () => {
   const projects = usePageStore((state) => state.projects);
@@ -34,10 +34,8 @@ export const HomePage = () => {
       >
         <div>
           <Header />
-          <div>
-            {projects.map(({ name }) => (
-              <ProjectTracker name={name} key={name} />
-            ))}
+          <div className="no-drag">
+            <ProjectList projectNames={projects.map((p) => p.name)} />
           </div>
         </div>
         <div

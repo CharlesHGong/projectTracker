@@ -16,6 +16,18 @@ export const usePageStore = create((set, get) => ({
   projects: [],
   projectNames: [],
   selectedProjectNames: [],
+  reorderList: (sourceIndex, destinationIndex) => {
+    const { selectedProjectNames, projects } = get();
+    const reorderedNames = Array.from(selectedProjectNames);
+    const [removedName] = reorderedNames.splice(sourceIndex, 1);
+    reorderedNames.splice(destinationIndex, 0, removedName);
+
+    const reorderedProjects = Array.from(projects);
+    const [removedProject] = reorderedProjects.splice(sourceIndex, 1);
+    reorderedProjects.splice(destinationIndex, 0, removedProject);
+    set({ selectedProjectNames: reorderedNames, projects: reorderedProjects });
+    request({ method: 'updateDisplayingProjectNames', payload: reorderedNames });
+  },
   addLog: async (name, startTime, endTime) => {
     await request({ method: 'addLog', payload: { name, log: { startTime, endTime } } });
     set({
