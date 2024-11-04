@@ -69,7 +69,7 @@ export const ProjectPage = ({ name }) => {
                 alignItems: "center",
               }}
             >
-              {start}: {time}
+              {start}: {time}s
               <PopoverDateRangePicker
                 defaultValue={[startTime, endTime]}
                 onConfirm={async (range) => {

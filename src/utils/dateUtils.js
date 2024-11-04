@@ -7,9 +7,23 @@ export const formatTime = (totalTime) => {
     .padStart(2, "0")}`;
 };
 
+const formatDateDisplay = () => {
+  const date = new Date();
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  return `${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")}/${year}`;
+}
+
+const formatTimeDisplay = (date) => {
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+}
+
 export function groupDatesByDay(logs) {
   const lmap = logs.reduce((acc, log) => {
-    const day = new Date(log.startTime).toLocaleDateString("en-US");
+    const day = formatDateDisplay(new Date(log.startTime));
     if (!acc[day]) {
       acc[day] = 0;
     }
@@ -36,7 +50,7 @@ export function getStartOfWeek(date) {
   const dayOfWeek = day.getDay(); // Get day of the week (0 = Sunday, 1 = Monday, etc.)
   const diff = day.getDate() - dayOfWeek;
   day.setDate(diff);
-  return day.toLocaleDateString("en-US");
+  return formatDateDisplay(day);
 }
 
 export function groupDatesByMonth(logs) {
@@ -54,7 +68,7 @@ export function groupDatesByMonth(logs) {
 
 export function groupByNone(logs) {
   return logs.map(({ startTime, endTime }) => ({
-    start: `${new Date(startTime).toLocaleDateString("en-US")}-${new Date(startTime).toLocaleTimeString("en-US")}`,
+    start: `${formatDateDisplay(new Date(startTime))}-${formatTimeDisplay(new Date(startTime))}`,
     time: formatTime(endTime - startTime),
     startTime,
     endTime,
