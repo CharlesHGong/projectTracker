@@ -70,6 +70,7 @@ export const Content = ({
         }}
         showNow={false}
         onChange={(date) => setStartingDate(date)}
+        style={{ width: 110 }}
       />
       <TimePicker
         needConfirm={false}
@@ -81,12 +82,13 @@ export const Content = ({
         }}
         showNow={false}
         onChange={(time) => setStartingTime(time)}
+        style={{ width: 80 }}
       />
       <InputNumber
-        addonAfter="min"
+        suffix="min"
         value={interval}
         controls={false}
-        style={{ width: 100 }}
+        style={{ width: 75 }}
         onChange={(interval) => setInterval(interval)}
       />
       <Button onClick={handleSubmit} type="primary">
