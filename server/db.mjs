@@ -52,6 +52,14 @@ export const updateProject = async ({ name, project }) => {
   return;
 }
 
+export const deleteProject = async (name) => {
+  const db = await loadDb();
+  db.data.projects = db.data.projects.filter((project) => project.name !== name);
+  db.data.displayingProjectNames = db.data.displayingProjectNames.filter((projectName) => projectName !== name);
+  await db.write();
+  return;
+}
+
 export const getProjectNames = async () => {
   const db = await loadDb();
   const projectNames = db.data.projects.map((project) => project.name);

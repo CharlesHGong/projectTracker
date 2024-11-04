@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { usePageStore } from "../store";
-import { Button, Input, Select } from "antd";
-import { LeftSquareOutlined } from "@ant-design/icons";
+import { Button, Input, Popconfirm, Select } from "antd";
+import { DeleteOutlined, LeftSquareOutlined } from "@ant-design/icons";
 import { PopoverDateRangePicker } from "../components/PopoverDateRangePicker";
 import { PlusOutlined } from "@ant-design/icons";
 import {
@@ -11,7 +11,6 @@ import {
   groupDatesByWeek,
 } from "../utils/dateUtils";
 import { request } from "../api";
-import dayjs from "dayjs";
 
 const getGroups = (logs, groupBy) => {
   switch (groupBy) {
@@ -84,7 +83,7 @@ export const ProjectPage = ({ name }) => {
                   setProject(newProject);
                 }}
               >
-                <Button size="small" className="no-drag">
+                <Button size="small" className="no-drag" type="primary">
                   Edit
                 </Button>
               </PopoverDateRangePicker>
@@ -153,6 +152,7 @@ const Header = ({ name, loadProject }) => {
         </PopoverDateRangePicker>
         <Button
           className="no-drag"
+          type="primary"
           size="small"
           onClick={() =>
             setEdit((edit) => {
@@ -165,6 +165,22 @@ const Header = ({ name, loadProject }) => {
         >
           {edit ? "Save" : "Edit"}
         </Button>
+        <Popconfirm
+          title="Delete the project"
+          description="Are you sure to delete this project?"
+          onConfirm={() => {
+            usePageStore.getState().deleteProject(name);
+            usePageStore.setState({ page: "home" });
+          }}
+        >
+          <Button
+            className="no-drag"
+            type="primary"
+            danger
+            size="small"
+            icon={<DeleteOutlined />}
+          />
+        </Popconfirm>
       </div>
     </div>
   );

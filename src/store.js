@@ -59,6 +59,11 @@ export const usePageStore = create((set, get) => ({
     const projects = await request({ method: 'getProjects', payload: { projectNames: selectedProjectNames, range } });
     set({ projects });
   },
+  deleteProject: async (name) => {
+    const { selectedProjectNames, projects } = get();
+    await request({ method: 'deleteProject', payload: name });
+    set({ selectedProjectNames: selectedProjectNames.filter((pn) => pn !== name), projects: projects.filter((p) => p.name !== name) });
+  },
   getProjectNames: async () => {
     const { projectNames, selectedProjectNames } = await request({ method: 'getProjectNames' });
     set({ projectNames, selectedProjectNames });

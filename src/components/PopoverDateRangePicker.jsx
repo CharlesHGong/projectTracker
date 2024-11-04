@@ -29,6 +29,7 @@ export const PopoverDateRangePicker = ({
       open={visible}
       onOpenChange={setVisible}
       destroyTooltipOnHide
+      placement="bottom"
     >
       {children}
     </Popover>

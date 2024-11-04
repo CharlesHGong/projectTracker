@@ -1,7 +1,7 @@
 import {
   createProject, addLog,
   getProjectNames, getProjects, updateDisplayingProjectNames,
-  getProject, updateProject
+  getProject, updateProject, deleteProject
 } from './db.mjs';
 import { exportLogs } from './exportLogs.mjs'
 
@@ -23,6 +23,8 @@ const getResponse = (method, payload) => {
       return getProject(payload);
     case 'updateProject':
       return updateProject(payload);
+    case 'deleteProject':
+      return deleteProject(payload);
     case 'getProjectNames':
       return getProjectNames();
     case 'updateDisplayingProjectNames':
