@@ -23,9 +23,13 @@ export const ProjectList = ({ projectNames }) => {
                   <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={{ ...provided.draggableProps.style }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      ...provided.draggableProps.style,
+                    }}
                   >
+                    <div {...provided.dragHandleProps}>☰</div>
                     <ProjectTracker name={name} key={name} />
                   </div>
                 )}

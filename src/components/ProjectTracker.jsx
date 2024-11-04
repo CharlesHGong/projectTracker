@@ -34,10 +34,12 @@ export const ProjectTracker = ({ name }) => {
         width: "100%",
         display: "grid",
         gridTemplateColumns: "1fr 1fr 1fr",
-        alignItems: "baseline",
+        alignItems: "center",
       }}
     >
-      <span style={{ textAlign: "left" }}>
+      <span
+        style={{ textAlign: "left", display: "flex", alignItems: "center" }}
+      >
         <Button
           className="no-drag"
           icon={<InfoCircleOutlined />}
@@ -45,7 +47,7 @@ export const ProjectTracker = ({ name }) => {
           type="link"
           onClick={() => usePageStore.setState({ page: `project/${name}` })}
         />
-        {name}
+        <span>{name}</span>
       </span>
       <span style={{ textAlign: "center" }}>{formatTime(totalTime)}</span>
       <Button
