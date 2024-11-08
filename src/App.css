@@ -9,13 +9,16 @@ body {
   height: 100%;
 }
 
+.header {
+  -webkit-app-region: drag; /* Makes the widget draggable */
+}
+
 .widget {
   height: 100%;
   overflow-x: hidden;
   padding: 10px;
   color: white;
   box-sizing: border-box;
-  -webkit-app-region: drag; /* Makes the widget draggable */
 }
 
 button {

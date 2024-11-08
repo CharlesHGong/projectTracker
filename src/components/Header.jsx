@@ -9,6 +9,7 @@ import { HomeMenuDropdown } from "./HomeMenuDropdown";
 export const Header = () => {
   return (
     <div
+      className="header"
       style={{
         width: "100%",
         display: "grid",

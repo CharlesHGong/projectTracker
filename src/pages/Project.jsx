@@ -40,62 +40,70 @@ export const ProjectPage = ({ name }) => {
   const logsGrouped = project ? getGroups(project.logs, groupBy) : [];
 
   return (
-    <>
+    <div
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <Header name={name} loadProject={loadProject} />
-      <div className="no-drag" style={{ textAlign: "right" }}>
-        <Select
-          popupClassName="no-drag"
-          size="small"
-          value={groupBy}
-          style={{ width: 80 }}
-          onChange={(v) => setGroupBy(v)}
-          options={[
-            { value: "day", label: "day" },
-            { value: "week", label: "week" },
-            { value: "month", label: "month" },
-            { value: "none", label: "none" },
-          ]}
-        />
-      </div>
-      <div style={{ textAlign: "center" }}>
-        {logsGrouped.map(({ start, time, startTime, endTime }) =>
-          groupBy === "none" ? (
-            <div
-              key={start}
-              style={{
-                margin: "4px 0",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              {start}: {time}s
-              <PopoverDateRangePicker
-                defaultValue={[startTime, endTime]}
-                onConfirm={async (range) => {
-                  const newProject = await usePageStore
-                    .getState()
-                    .updateLog(
-                      project,
-                      { startTime, endTime },
-                      { startTime: range[0], endTime: range[1] }
-                    );
-                  setProject(newProject);
+      <div style={{ flex: "1 1 auto", overflowY: "auto" }}>
+        <div className="no-drag" style={{ textAlign: "right" }}>
+          <Select
+            popupClassName="no-drag"
+            size="small"
+            value={groupBy}
+            style={{ width: 80 }}
+            onChange={(v) => setGroupBy(v)}
+            options={[
+              { value: "day", label: "day" },
+              { value: "week", label: "week" },
+              { value: "month", label: "month" },
+              { value: "none", label: "none" },
+            ]}
+          />
+        </div>
+        <div style={{ textAlign: "center" }}>
+          {logsGrouped.map(({ start, time, startTime, endTime }) =>
+            groupBy === "none" ? (
+              <div
+                key={start}
+                style={{
+                  margin: "4px 0",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                 }}
               >
-                <Button size="small" className="no-drag" type="primary">
-                  Edit
-                </Button>
-              </PopoverDateRangePicker>
-            </div>
-          ) : (
-            <div key={start} style={{ margin: "4px 0" }}>
-              {start}: {time}
-            </div>
-          )
-        )}
+                {start}: {time}s
+                <PopoverDateRangePicker
+                  defaultValue={[startTime, endTime]}
+                  onConfirm={async (range) => {
+                    const newProject = await usePageStore
+                      .getState()
+                      .updateLog(
+                        project,
+                        { startTime, endTime },
+                        { startTime: range[0], endTime: range[1] }
+                      );
+                    setProject(newProject);
+                  }}
+                >
+                  <Button size="small" className="no-drag" type="primary">
+                    Edit
+                  </Button>
+                </PopoverDateRangePicker>
+              </div>
+            ) : (
+              <div key={start} style={{ margin: "4px 0" }}>
+                {start}: {time}
+              </div>
+            )
+          )}
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 
@@ -104,6 +112,7 @@ const Header = ({ name, loadProject }) => {
   const [newName, setNewName] = useState(name);
   return (
     <div
+      className="header"
       style={{
         width: "100%",
         display: "grid",

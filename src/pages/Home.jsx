@@ -23,35 +23,30 @@ export const HomePage = () => {
   }, []);
 
   return (
-    <>
+    <div
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Header />
+      <div style={{ flex: "1 1 auto", overflowY: "auto" }}>
+        <ProjectList projectNames={projects.map((p) => p.name)} />
+      </div>
       <div
         style={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
+          width: "100%",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          alignItems: "baseline",
+          paddingLeft: "8px",
         }}
       >
-        <div>
-          <Header />
-          <div className="no-drag">
-            <ProjectList projectNames={projects.map((p) => p.name)} />
-          </div>
-        </div>
-        <div
-          style={{
-            width: "100%",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            alignItems: "baseline",
-            paddingLeft: "8px",
-          }}
-        >
-          <div style={{ marginLeft: 16 }}>{rangeLabelMap[range]}</div>
-          <div style={{ textAlign: "center" }}>{totalTime}</div>
-          <div />
-        </div>
+        <div style={{ marginLeft: 16 }}>{rangeLabelMap[range]}</div>
+        <div style={{ textAlign: "center" }}>{totalTime}</div>
+        <div />
       </div>
-    </>
+    </div>
   );
 };
