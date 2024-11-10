@@ -2,9 +2,10 @@ import React from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { ProjectTracker } from "./ProjectTracker";
 import { usePageStore } from "../store";
+import type { DropResult } from "@hello-pangea/dnd";
 
-export const ProjectList = ({ projectNames }) => {
-  const handleDragEnd = (result) => {
+export const ProjectList = ({ projectNames }: { projectNames: string[] }) => {
+  const handleDragEnd = (result: DropResult) => {
     const { source, destination } = result;
     // Do nothing if item is dropped outside the list
     if (!destination) return;

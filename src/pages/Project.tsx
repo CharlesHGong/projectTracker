@@ -11,8 +11,12 @@ import {
   groupDatesByWeek,
 } from "../utils/dateUtils";
 import { request } from "../api";
+import { Log, Project } from "../types";
 
-const getGroups = (logs, groupBy) => {
+const getGroups = (
+  logs: Log[],
+  groupBy: string
+): { start: string; time: string; startTime?: number; endTime?: number }[] => {
   switch (groupBy) {
     case "day":
       return groupDatesByDay(logs);
@@ -25,9 +29,9 @@ const getGroups = (logs, groupBy) => {
   }
 };
 
-export const ProjectPage = ({ name }) => {
+export const ProjectPage = ({ name }: { name: string }) => {
   const [groupBy, setGroupBy] = useState("none");
-  const [project, setProject] = useState(null);
+  const [project, setProject] = useState<Project | null>(null);
 
   const loadProject = useCallback(async () => {
     const project = await request({ method: "getProject", payload: name });
@@ -77,23 +81,26 @@ export const ProjectPage = ({ name }) => {
                 }}
               >
                 {start}: {time}s
-                <PopoverDateRangePicker
-                  defaultValue={[startTime, endTime]}
-                  onConfirm={async (range) => {
-                    const newProject = await usePageStore
-                      .getState()
-                      .updateLog(
-                        project,
-                        { startTime, endTime },
-                        { startTime: range[0], endTime: range[1] }
-                      );
-                    setProject(newProject);
-                  }}
-                >
-                  <Button size="small" className="no-drag" type="primary">
-                    Edit
-                  </Button>
-                </PopoverDateRangePicker>
+                {startTime && endTime && (
+                  <PopoverDateRangePicker
+                    defaultValue={[startTime, endTime]}
+                    onConfirm={async (range) => {
+                      if (!project) return;
+                      const newProject = await usePageStore
+                        .getState()
+                        .updateLog(
+                          project,
+                          { startTime, endTime },
+                          { startTime: range[0], endTime: range[1] }
+                        );
+                      setProject(newProject);
+                    }}
+                  >
+                    <Button size="small" className="no-drag" type="primary">
+                      Edit
+                    </Button>
+                  </PopoverDateRangePicker>
+                )}
               </div>
             ) : (
               <div key={start} style={{ margin: "4px 0" }}>
@@ -107,7 +114,13 @@ export const ProjectPage = ({ name }) => {
   );
 };
 
-const Header = ({ name, loadProject }) => {
+const Header = ({
+  name,
+  loadProject,
+}: {
+  name: string;
+  loadProject: () => void;
+}) => {
   const [edit, setEdit] = useState(false);
   const [newName, setNewName] = useState(name);
   return (

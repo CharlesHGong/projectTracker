@@ -1,17 +1,12 @@
-import React, { useMemo, useState } from "react";
+import React, { ReactNode, useMemo, useState } from "react";
 import { Checkbox, Dropdown, Slider } from "antd";
-import { usePageStore } from "../store";
+import {  usePageStore } from "../store";
 import { request } from "../api";
+import { TimeRangeOption, rangeLabelMap } from "../types";
 
 const primaryColorStyle = {
   background: "#1989fa",
   color: "#fff",
-};
-
-export const rangeLabelMap = {
-  day: "Today",
-  week: "This Week",
-  all: "All",
 };
 
 const TransparencySlider = () => {
@@ -28,7 +23,7 @@ const TransparencySlider = () => {
   );
 };
 
-export const HomeMenuDropdown = ({ children }) => {
+export const HomeMenuDropdown = ({ children }: { children: ReactNode }) => {
   const [open, setOpen] = useState(false);
   const projectNames = usePageStore((state) => state.projectNames);
   const range = usePageStore((state) => state.range);
@@ -80,9 +75,9 @@ export const HomeMenuDropdown = ({ children }) => {
     return [projectsMenu, timeRangeMenu, bgAlpha, downloadMenu];
   }, [projectNames, selectedProjectNames, range]);
 
-  const handleSelect = async ({ key }) => {
+  const handleSelect = async ({ key }: { key: string }) => {
     if (key === "download") {
-      await request({ method: "exportLogs" });
+      await request({ method: "exportLogs", payload: undefined });
       window.alert("Logs exported successfully!");
     } else if (key.startsWith("projects")) {
       const projectName = key.split("-")[1];
@@ -95,7 +90,7 @@ export const HomeMenuDropdown = ({ children }) => {
       });
       usePageStore.getState().loadProjects();
     } else if (key.startsWith("range")) {
-      usePageStore.setState({ range: key.split("-")[1] });
+      usePageStore.setState({ range: key.split("-")[1] as TimeRangeOption });
       usePageStore.getState().loadProjects();
     }
   };

@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { Popover, DatePicker, Button, InputNumber } from "antd";
 import dayjs from "dayjs";
 
 const { TimePicker } = DatePicker;
+
+type ContentType = {
+  onConfirm: (a: [number, number]) => void;
+  confirmText?: string;
+  defaultValue: [number, number];
+};
 
 const minute = 60 * 1000;
 export const PopoverDateRangePicker = ({
@@ -10,7 +16,7 @@ export const PopoverDateRangePicker = ({
   onConfirm,
   confirmText,
   defaultValue,
-}) => {
+}: { children: ReactNode } & ContentType) => {
   const [visible, setVisible] = useState(false);
 
   const content = (
@@ -41,7 +47,7 @@ export const Content = ({
   confirmText,
   defaultValue,
   setVisible,
-}) => {
+}: { setVisible: (visible: boolean) => void } & ContentType) => {
   const [startingDate, setStartingDate] = useState(dayjs(defaultValue[0]));
   const [startingTime, setStartingTime] = useState(dayjs(defaultValue[0]));
   const [interval, setInterval] = useState(
@@ -76,7 +82,7 @@ export const Content = ({
       <TimePicker
         needConfirm={false}
         value={startingTime}
-        size="medium"
+        size="middle"
         format={{
           format: "HH:mm",
           type: "mask",
@@ -90,7 +96,7 @@ export const Content = ({
         value={interval}
         controls={false}
         style={{ width: 75 }}
-        onChange={(interval) => setInterval(interval)}
+        onChange={(interval) => setInterval(interval ?? 0)}
       />
       <Button onClick={handleSubmit} type="primary">
         {confirmText ?? "Save"}

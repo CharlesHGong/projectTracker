@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { usePageStore } from "../store";
 import { Button } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { formatTime } from "../utils/dateUtils";
 
-export const ProjectTracker = ({ name }) => {
+export const ProjectTracker = ({ name }: { name: string }) => {
   const now = usePageStore((state) =>
     state.workingProjectName === name ? state.now : undefined
   );
@@ -20,7 +20,7 @@ export const ProjectTracker = ({ name }) => {
     );
   });
   const totalTime =
-    previousTime + (startTime ? Math.max(0, now - startTime) : 0);
+    previousTime + (startTime ? Math.max(0, now ?? Date.now() - startTime) : 0);
 
   const handleClick = () => {
     const { handleStartOrStop } = usePageStore.getState();

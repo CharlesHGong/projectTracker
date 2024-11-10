@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
-import { usePageStore } from "../store";
-import { Header } from "../components/Header";
+import {  usePageStore } from "../store";
+import { Header } from "../components/HomeHeader";
 import { formatTime } from "../utils/dateUtils";
-import { rangeLabelMap } from "../components/HomeMenuDropdown";
 import { ProjectList } from "../components/ProjectList";
+import { rangeLabelMap } from "../types";
 
 export const HomePage = () => {
   const projects = usePageStore((state) => state.projects);
