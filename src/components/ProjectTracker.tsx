@@ -20,7 +20,8 @@ export const ProjectTracker = ({ name }: { name: string }) => {
     );
   });
   const totalTime =
-    previousTime + (startTime ? Math.max(0, now ?? Date.now() - startTime) : 0);
+    previousTime +
+    (startTime ? Math.max(0, (now ?? Date.now()) - startTime) : 0);
 
   const handleClick = () => {
     const { handleStartOrStop } = usePageStore.getState();
