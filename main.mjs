@@ -1,13 +1,10 @@
-import { app, BrowserWindow, ipcMain, screen, Tray, Menu } from 'electron';
-import path from 'path';
-import { dirname } from 'path';
+import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import { handleRequest } from './server/api.mjs';
-import { fileURLToPath } from 'url';
+import { DEFAULT_BROWSER_WINDOW_OPTIONS, mode } from './server/constants.mjs';
+import { createWindowsTray } from './server/tray.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-let tray = null;
 let mainWindow;
-const mode = process.env.MODE || 'production';
+
 // Check if another instance of the app is already running
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -26,20 +23,9 @@ if (!gotTheLock) {
     const { width: screenWidth } = screen.getPrimaryDisplay().workAreaSize;
 
     mainWindow = new BrowserWindow({
-      width: 300,
-      height: 200,
+      ...DEFAULT_BROWSER_WINDOW_OPTIONS,
       x: screenWidth - 300,  // Position the window at the top right corner
       y: 0,                  // Top of the screen
-      frame: false,
-      alwaysOnTop: true,
-      transparent: true,
-      skipTaskbar: true,
-      resizable: true,
-      webPreferences: {
-        preload: path.join(__dirname, 'preload.js'),
-        contextIsolation: true,                       // Enable context isolation for security
-        enableRemoteModule: false,
-      },
     });
 
     if (mode === 'production') {
@@ -52,19 +38,7 @@ if (!gotTheLock) {
     }
 
     if (process.platform !== 'darwin') {
-      // Create the Tray icon
-      tray = new Tray(path.join(__dirname, 'public/icon.png')); // Use a path to your tray icon
-      const contextMenu = Menu.buildFromTemplate([
-        { label: 'Show', click: () => mainWindow.show() },
-        { label: 'Hide', click: () => mainWindow.hide() },
-        { label: 'Quit', click: () => app.quit() },
-      ]);
-      tray.setToolTip('Project Time Tracker');
-      tray.setContextMenu(contextMenu);
-      // Show the window when the tray icon is clicked
-      tray.on('click', () => {
-        mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
-      });
+      createWindowsTray(mainWindow);
     }
 
     // Handle message from renderer

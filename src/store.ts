@@ -4,6 +4,7 @@ import { Log, Project, TimeRangeOption } from "./types";
 
 type PageStore = {
   page: string;
+  minimize: boolean;
   range: TimeRangeOption;
   bgAlpha: number;
   setBgAlpha: (a: number) => void;
@@ -26,6 +27,7 @@ type PageStore = {
 
 export const usePageStore = create<PageStore>((set, get) => ({
   page: "home",
+  minimize: false,
   range: "day",
   bgAlpha: parseFloat(localStorage.getItem("bgAlpha") ?? "0.8"),
   setBgAlpha: (a) => {

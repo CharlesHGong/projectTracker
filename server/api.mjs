@@ -4,6 +4,7 @@ import {
   getProject, updateProject, deleteProject
 } from './db.mjs';
 import { exportLogs } from './exportLogs.mjs'
+import { minimize } from './minimize.mjs';
 
 export const handleRequest = async (data, mainWindow) => {
   const { method, payload, id } = data;
@@ -11,7 +12,6 @@ export const handleRequest = async (data, mainWindow) => {
   return { id, data: response };
 }
 
-let windowHeight = 200;
 const getResponse = (method, payload, mainWindow) => {
   switch (method) {
     case 'createProject':
@@ -33,13 +33,7 @@ const getResponse = (method, payload, mainWindow) => {
     case 'exportLogs':
       return exportLogs(payload);
     case 'minimize':
-      if (payload) {
-        windowHeight = mainWindow.getContentSize()[1];
-        mainWindow.setContentSize(mainWindow.getContentSize()[0], 40);
-      } else {
-        mainWindow.setContentSize(mainWindow.getContentSize()[0], windowHeight ?? 200);
-      }
-      return;
+      return minimize(mainWindow, payload);
     default:
       return 'Invalid method';
   }

@@ -29,7 +29,8 @@ type RequestArgs =
   | {
       method: "exportLogs";
       payload: { type: string; startTime: number; endTime: number };
-    };
+    }
+  | { method: "minimize"; payload: boolean };
 
 // Define the return types associated with each method
 type RequestReturnType<T extends RequestArgs["method"]> =
@@ -50,6 +51,8 @@ type RequestReturnType<T extends RequestArgs["method"]> =
     : T extends "updateDisplayingProjectNames"
     ? Promise<void>
     : T extends "exportLogs"
+    ? Promise<void>
+    : T extends "minimize"
     ? Promise<void>
     : never;
 

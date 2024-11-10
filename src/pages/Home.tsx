@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
-import {  usePageStore } from "../store";
+import { usePageStore } from "../store";
 import { Header } from "../components/HomeHeader";
 import { formatTime } from "../utils/dateUtils";
 import { ProjectList } from "../components/ProjectList";
 import { rangeLabelMap } from "../types";
 
 export const HomePage = () => {
+  const minimize = usePageStore((state) => state.minimize);
   const projects = usePageStore((state) => state.projects);
   const previousTime = usePageStore((state) =>
     state.projects
@@ -31,22 +32,26 @@ export const HomePage = () => {
       }}
     >
       <Header />
-      <div style={{ flex: "1 1 auto", overflowY: "auto" }}>
-        <ProjectList projectNames={projects.map((p) => p.name)} />
-      </div>
-      <div
-        style={{
-          width: "100%",
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr",
-          alignItems: "baseline",
-          paddingLeft: "8px",
-        }}
-      >
-        <div style={{ marginLeft: 16 }}>{rangeLabelMap[range]}</div>
-        <div style={{ textAlign: "center" }}>{totalTime}</div>
-        <div />
-      </div>
+      {!minimize && (
+        <>
+          <div style={{ flex: "1 1 auto", overflowY: "auto" }}>
+            <ProjectList projectNames={projects.map((p) => p.name)} />
+          </div>
+          <div
+            style={{
+              width: "100%",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              alignItems: "baseline",
+              paddingLeft: "8px",
+            }}
+          >
+            <div style={{ marginLeft: 16 }}>{rangeLabelMap[range]}</div>
+            <div style={{ textAlign: "center" }}>{totalTime}</div>
+            <div />
+          </div>
+        </>
+      )}
     </div>
   );
 };
