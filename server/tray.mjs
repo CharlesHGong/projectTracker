@@ -1,4 +1,6 @@
 import { Menu, Tray } from "electron";
+import path from 'path';
+import { __dirname } from './constants.mjs';
 
 let tray = null;
 export const createWindowsTray = (mainWindow) => {
