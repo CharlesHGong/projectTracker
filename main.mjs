@@ -70,7 +70,7 @@ if (!gotTheLock) {
     // Handle message from renderer
     ipcMain.on('request', async (event, data) => {
       console.log('Received message from renderer:', data);
-      const response = await handleRequest(data);
+      const response = await handleRequest(data, mainWindow);
       console.log('response from renderer:', response);
       mainWindow.webContents.send('response', response);
     });

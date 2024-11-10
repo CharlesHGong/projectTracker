@@ -5,13 +5,14 @@ import {
 } from './db.mjs';
 import { exportLogs } from './exportLogs.mjs'
 
-export const handleRequest = async (data) => {
+export const handleRequest = async (data, mainWindow) => {
   const { method, payload, id } = data;
-  const response = await getResponse(method, payload);
+  const response = await getResponse(method, payload, mainWindow);
   return { id, data: response };
 }
 
-const getResponse = (method, payload) => {
+let windowHeight = 200;
+const getResponse = (method, payload, mainWindow) => {
   switch (method) {
     case 'createProject':
       return createProject(payload);
@@ -31,6 +32,14 @@ const getResponse = (method, payload) => {
       return updateDisplayingProjectNames(payload);
     case 'exportLogs':
       return exportLogs(payload);
+    case 'minimize':
+      if (payload) {
+        windowHeight = mainWindow.getContentSize()[1];
+        mainWindow.setContentSize(mainWindow.getContentSize()[0], 40);
+      } else {
+        mainWindow.setContentSize(mainWindow.getContentSize()[0], windowHeight ?? 200);
+      }
+      return;
     default:
       return 'Invalid method';
   }
