@@ -34,7 +34,14 @@ export const HomePage = () => {
       <Header />
       {!minimize && (
         <>
-          <div style={{ flex: "1 1 auto", overflowY: "auto" }}>
+          <div
+            style={{
+              flex: "1 1 auto",
+              overflowY: "auto",
+              overflowX: "hidden",
+              width: "100%",
+            }}
+          >
             <ProjectList projectNames={projects.map((p) => p.name)} />
           </div>
           <div
