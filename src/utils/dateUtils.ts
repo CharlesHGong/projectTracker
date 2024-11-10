@@ -43,7 +43,9 @@ export function groupDatesByDay(logs: Log[]) {
 
 export function groupDatesByWeek(logs: Log[]) {
   const lmap = logs.reduce((acc: Record<string, number>, log) => {
-    const startOfWeek = getStartOfWeek(new Date(log.startTime)); // Get the start of the week in 'YYYY-MM-DD' format
+    const startOfWeek = formatDateDisplay(
+      getStartOfWeek(new Date(log.startTime))
+    ); // Get the start of the week in 'YYYY-MM-DD' format
     if (!acc[startOfWeek]) {
       acc[startOfWeek] = 0;
     }
@@ -61,7 +63,8 @@ export function getStartOfWeek(date: Date) {
   const dayOfWeek = day.getDay(); // Get day of the week (0 = Sunday, 1 = Monday, etc.)
   const diff = day.getDate() - dayOfWeek;
   day.setDate(diff);
-  return formatDateDisplay(day);
+  day.setHours(0, 0, 0, 0);
+  return day;
 }
 
 export function groupDatesByMonth(logs: Log[]) {

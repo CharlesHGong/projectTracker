@@ -26,7 +26,10 @@ type RequestArgs =
   | { method: "deleteProject"; payload: string }
   | { method: "getProjectNames"; payload: undefined }
   | { method: "updateDisplayingProjectNames"; payload: string[] }
-  | { method: "exportLogs"; payload: undefined };
+  | {
+      method: "exportLogs";
+      payload: { type: string; startTime: number; endTime: number };
+    };
 
 // Define the return types associated with each method
 type RequestReturnType<T extends RequestArgs["method"]> =

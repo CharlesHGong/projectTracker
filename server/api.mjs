@@ -30,7 +30,7 @@ const getResponse = (method, payload) => {
     case 'updateDisplayingProjectNames':
       return updateDisplayingProjectNames(payload);
     case 'exportLogs':
-      return exportLogs();
+      return exportLogs(payload);
     default:
       return 'Invalid method';
   }

@@ -32,3 +32,18 @@ button {
 .ant-picker-dropdown {
   -webkit-app-region: no-drag; /* Prevents dragging for specific elements */
 }
+
+.no-padding-modal .ant-modal-content {
+  padding: 8px;
+}
+
+.no-padding-modal .ant-modal-close {
+  top: 8px;
+  right: 8px;
+  font-size: 1rem;
+}
+
+/* CSS to control the calendar dropdown width if needed */
+.one-month-calendar .ant-picker-panels {
+  width: 300px; /* adjust width to suit single calendar layout */
+}

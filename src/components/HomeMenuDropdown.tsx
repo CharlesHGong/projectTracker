@@ -1,8 +1,8 @@
 import React, { ReactNode, useMemo, useState } from "react";
 import { Checkbox, Dropdown, Slider } from "antd";
-import {  usePageStore } from "../store";
-import { request } from "../api";
+import { usePageStore } from "../store";
 import { TimeRangeOption, rangeLabelMap } from "../types";
+import { DownloadLogsModal } from "./DownloadLogsModal";
 
 const primaryColorStyle = {
   background: "#1989fa",
@@ -24,6 +24,9 @@ const TransparencySlider = () => {
 };
 
 export const HomeMenuDropdown = ({ children }: { children: ReactNode }) => {
+  const [downLoadModalOpen, setDownloadModalOpen] = useState(false);
+  const handleDownloadModalClose = () => setDownloadModalOpen(false);
+
   const [open, setOpen] = useState(false);
   const projectNames = usePageStore((state) => state.projectNames);
   const range = usePageStore((state) => state.range);
@@ -77,8 +80,7 @@ export const HomeMenuDropdown = ({ children }: { children: ReactNode }) => {
 
   const handleSelect = async ({ key }: { key: string }) => {
     if (key === "download") {
-      await request({ method: "exportLogs", payload: undefined });
-      window.alert("Logs exported successfully!");
+      setDownloadModalOpen(true);
     } else if (key.startsWith("projects")) {
       const projectName = key.split("-")[1];
       const isInsert = !selectedProjectNames.includes(projectName);
@@ -96,19 +98,24 @@ export const HomeMenuDropdown = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <Dropdown
-      open={open}
-      onOpenChange={setOpen}
-      placement="bottomRight"
-      trigger={["click"]}
-      overlayClassName="no-drag"
-      menu={{
-        items: menuItems,
-        onClick: (e) => handleSelect(e),
-        triggerSubMenuAction: "click",
-      }}
-    >
-      {children}
-    </Dropdown>
+    <>
+      {downLoadModalOpen && (
+        <DownloadLogsModal onClose={handleDownloadModalClose} />
+      )}
+      <Dropdown
+        open={open}
+        onOpenChange={setOpen}
+        placement="bottomRight"
+        trigger={["click"]}
+        overlayClassName="no-drag"
+        menu={{
+          items: menuItems,
+          onClick: (e) => handleSelect(e),
+          triggerSubMenuAction: "click",
+        }}
+      >
+        {children}
+      </Dropdown>
+    </>
   );
 };
