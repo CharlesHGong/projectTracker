@@ -55,7 +55,9 @@ export const DownloadLogsModal = ({ onClose }: { onClose: () => void }) => {
     <Modal
       title={<div style={{ textAlign: "center" }}>Download Logs</div>}
       open
+      keyboard
       onClose={onClose}
+      onCancel={onClose}
       destroyOnClose
       width={250}
       style={{ top: 20 }}
@@ -68,7 +70,12 @@ export const DownloadLogsModal = ({ onClose }: { onClose: () => void }) => {
             justifyContent: "space-between",
           }}
         >
-          <Button size="small" key="raw" onClick={() => handleExport("raw")}>
+          <Button
+            size="small"
+            key="raw"
+            onClick={() => handleExport("raw")}
+            loading={loading}
+          >
             Export Raw
           </Button>
           <Button
@@ -76,6 +83,7 @@ export const DownloadLogsModal = ({ onClose }: { onClose: () => void }) => {
             key="report"
             type="primary"
             onClick={() => handleExport("report")}
+            loading={loading}
           >
             Export Report
           </Button>

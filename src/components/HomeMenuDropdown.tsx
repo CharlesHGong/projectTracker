@@ -100,7 +100,10 @@ export const HomeMenuDropdown = ({ children }: { children: ReactNode }) => {
   return (
     <>
       {downLoadModalOpen && (
-        <DownloadLogsModal onClose={handleDownloadModalClose} />
+        <DownloadLogsModal
+          open={downLoadModalOpen}
+          onClose={handleDownloadModalClose}
+        />
       )}
       <Dropdown
         open={open}
