@@ -1,4 +1,4 @@
-import { Menu, Tray } from "electron";
+import { Menu, Tray, app } from "electron";
 import path from 'path';
 import { __dirname } from './constants.mjs';
 
