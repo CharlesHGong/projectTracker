@@ -1,7 +1,7 @@
 {
   "name": "projecttimetracker",
   "description": "Project Time Tracker",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "main.mjs",
   "scripts": {
     "start:web": "webpack serve --config webpack.dev.js",
