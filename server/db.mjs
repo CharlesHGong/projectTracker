@@ -37,7 +37,7 @@ export const getProjects = async ({ projectNames, range }) => {
   const unOrderedProjects = db.data.projects
     .filter((project) => projectNames.includes(project.name))
     .map(p => ({ ...p, logs: p.logs.filter((log) => log.startTime >= lowerBound) }));
-  return projectNames.map((name) => unOrderedProjects.find((project) => project.name === name));
+  return projectNames.map((name) => unOrderedProjects.find((project) => project.name === name)).filter(Boolean);
 }
 
 export const getProject = async (name) => {
@@ -63,7 +63,7 @@ export const deleteProject = async (name) => {
 export const getProjectNames = async () => {
   const db = await loadDb();
   const projectNames = db.data.projects.map((project) => project.name);
-  const selectedProjectNames = db.data.displayingProjectNames;
+  const selectedProjectNames = db.data.displayingProjectNames.filter(n => projectNames.includes(n));
   return { projectNames, selectedProjectNames };
 }
 
