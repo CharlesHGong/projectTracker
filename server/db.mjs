@@ -64,6 +64,7 @@ export const getProjectNames = async () => {
   const db = await loadDb();
   const projectNames = db.data.projects.map((project) => project.name);
   const selectedProjectNames = db.data.displayingProjectNames.filter(n => projectNames.includes(n));
+  projectNames.sort();
   return { projectNames, selectedProjectNames };
 }
 

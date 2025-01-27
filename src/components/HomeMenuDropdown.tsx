@@ -82,7 +82,7 @@ export const HomeMenuDropdown = ({ children }: { children: ReactNode }) => {
     if (key === "download") {
       setDownloadModalOpen(true);
     } else if (key.startsWith("projects")) {
-      const projectName = key.split("-")[1];
+      const projectName = key.split("-").slice(1).join('-');
       const isInsert = !selectedProjectNames.includes(projectName);
       const updatedSelectedProjectNames = isInsert
         ? [...selectedProjectNames, projectName]
