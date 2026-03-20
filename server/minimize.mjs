@@ -11,7 +11,7 @@ export const minimize = (mainWindow, payload) => {
     const { x, y } = mainWindow.getContentBounds();
     windowX = x;
     windowY = y;
-    mainWindow.setBounds({ x: x + windowWidth - DEFAULT_WIDTH, y, width: DEFAULT_WIDTH, height: 40 });
+    mainWindow.setBounds({ x, y, width: windowWidth, height: 40 });
   } else {
     mainWindow.setBounds({ x: windowX, y: windowY, width: windowWidth, height: windowHeight });
   }
