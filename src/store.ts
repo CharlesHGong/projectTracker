@@ -11,6 +11,7 @@ type PageStore = {
   startTime: number | undefined;
   now: number | undefined;
   workingProjectName: string;
+  lastStartedProjectName: string;
   timeIntervalRef: NodeJS.Timeout | undefined;
   projects: Project[];
   projectNames: string[];
@@ -37,6 +38,7 @@ export const usePageStore = create<PageStore>((set, get) => ({
   startTime: undefined,
   now: undefined,
   workingProjectName: "",
+  lastStartedProjectName: "",
   timeIntervalRef: undefined,
   projects: [],
   projectNames: [],
@@ -133,6 +135,7 @@ export const usePageStore = create<PageStore>((set, get) => ({
         startTime: Date.now(),
         now: Date.now(),
         workingProjectName: name,
+        lastStartedProjectName: name,
         timeIntervalRef: newTimeIntervalRef,
       });
     } else {
