@@ -5,6 +5,14 @@ import path from 'path';
 
 const hoursInMs = 1000 * 60 * 60;
 
+const escapeCsvValue = (value) => {
+  const stringValue = String(value ?? '');
+  if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+    return `"${stringValue.replaceAll('"', '""')}"`;
+  }
+  return stringValue;
+};
+
 export const exportLogs = async ({ type, startTime, endTime }) => {
   const logs = await getLogsBetweenDates({ startDate: startTime, endDate: endTime });
   if (type === 'raw') {
@@ -15,7 +23,12 @@ export const exportLogs = async ({ type, startTime, endTime }) => {
 }
 
 const exportReport = async ({ logs, startTime, endTime }) => {
-  const projectNames = logs.reduce((acc, log) => acc.add(log.projectName), new Set());
+  const projectDetails = logs.reduce((acc, log) => {
+    if (!acc.has(log.projectName)) {
+      acc.set(log.projectName, log.projectCode ?? '');
+    }
+    return acc;
+  }, new Map());
   const daysBetween = [];
   let currentDate = new Date(startTime);
   currentDate.setHours(0, 0, 0, 0);
@@ -25,9 +38,9 @@ const exportReport = async ({ logs, startTime, endTime }) => {
     currentDate.setDate(currentDate.getDate() + 1);
   }
   const projectDateMap = getProjectDateMap(logs);
-  const headers = ['Project Name', ...daysBetween.map(date => date.toLocaleDateString("en-US")), 'Total'];
-  const rows = Array.from(projectNames).map(projectName => {
-    const row = [projectName];
+  const headers = ['Project Name', 'Project Code', ...daysBetween.map(date => date.toLocaleDateString("en-US")), 'Total'];
+  const rows = Array.from(projectDetails.entries()).map(([projectName, projectCode]) => {
+    const row = [projectName, projectCode];
     let sum = 0;
     daysBetween.forEach(date => {
       const key = date.toLocaleDateString("en-US") + ':' + projectName;
@@ -38,7 +51,9 @@ const exportReport = async ({ logs, startTime, endTime }) => {
     row.push(sum.toFixed(2));
     return row;
   });
-  const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+  const csvContent = [headers, ...rows]
+    .map((row) => row.map(escapeCsvValue).join(','))
+    .join('\n');
   const filePath = path.join(`${app.getPath('downloads')}/report-${getFileName(startTime, endTime)}.csv`);
   fs.writeFileSync(filePath, csvContent);
   return { success: true };
@@ -47,14 +62,17 @@ const exportReport = async ({ logs, startTime, endTime }) => {
 const exportRawLogs = async ({ logs, startTime, endTime }) => {
   const sortedLogs = [...logs];
   sortedLogs.sort((a, b) => a.startTime - b.startTime);
-  const headers = ['Project Name', 'Start Time', 'End Time', 'Duration(h)'];
+  const headers = ['Project Name', 'Project Code', 'Start Time', 'End Time', 'Duration(h)'];
   const rows = sortedLogs.map(log => [
     log.projectName,
+    log.projectCode ?? '',
     new Date(log.startTime).toLocaleString(),
     new Date(log.endTime).toLocaleString(),
     ((log.endTime - log.startTime) / (1000 * 60 * 60)).toFixed(2)
   ]);
-  const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+  const csvContent = [headers, ...rows]
+    .map((row) => row.map(escapeCsvValue).join(','))
+    .join('\n');
   const filePath = path.join(`${app.getPath('downloads')}/rawLogs-${getFileName(startTime, endTime)}.csv`);
   fs.writeFileSync(filePath, csvContent);
   return { success: true };

@@ -35,7 +35,7 @@ export const ProjectPage = ({ name }: { name: string }) => {
 
   const loadProject = useCallback(async () => {
     const project = await request({ method: "getProject", payload: name });
-    setProject(project);
+    setProject(project ?? null);
   }, [name]);
   useEffect(() => {
     loadProject();
@@ -51,7 +51,7 @@ export const ProjectPage = ({ name }: { name: string }) => {
         flexDirection: "column",
       }}
     >
-      <Header name={name} loadProject={loadProject} />
+      <Header name={name} project={project} loadProject={loadProject} />
       <div style={{ flex: "1 1 auto", overflowY: "auto" }}>
         <div className="no-drag" style={{ textAlign: "right" }}>
           <Select
@@ -116,13 +116,25 @@ export const ProjectPage = ({ name }: { name: string }) => {
 
 const Header = ({
   name,
+  project,
   loadProject,
 }: {
   name: string;
+  project: Project | null;
   loadProject: () => void;
 }) => {
   const [edit, setEdit] = useState(false);
   const [newName, setNewName] = useState(name);
+  const [newCode, setNewCode] = useState(project?.code ?? "");
+
+  useEffect(() => {
+    setNewName(name);
+  }, [name]);
+
+  useEffect(() => {
+    setNewCode(project?.code ?? "");
+  }, [project?.code]);
+
   return (
     <div
       className="header"
@@ -145,14 +157,35 @@ const Header = ({
       </div>
       <div style={{ textAlign: "center" }}>
         {edit ? (
-          <Input
+          <div
             className="no-drag"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            style={{ textAlign: "center", padding: 0 }}
-          />
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 4,
+              alignItems: "stretch",
+            }}
+          >
+            <Input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="Project name"
+              style={{ textAlign: "center", padding: 0 }}
+            />
+            <Input
+              value={newCode}
+              onChange={(e) => setNewCode(e.target.value)}
+              placeholder="Project code"
+              style={{ textAlign: "center", padding: 0 }}
+            />
+          </div>
         ) : (
-          name
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <div>{name}</div>
+            <div style={{ fontSize: 12, color: "#fff" }}>
+              {project?.code || "No code"}
+            </div>
+          </div>
         )}
       </div>
       <div
@@ -176,14 +209,18 @@ const Header = ({
           className="no-drag"
           type="primary"
           size="small"
-          onClick={() =>
-            setEdit((edit) => {
-              if (edit) {
-                usePageStore.getState().updateName(name, newName);
+          onClick={async () => {
+            if (edit) {
+              await usePageStore.getState().updateProjectDetails(name, {
+                name: newName,
+                code: newCode,
+              });
+              if (newName === name) {
+                loadProject();
               }
-              return !edit;
-            })
-          }
+            }
+            setEdit(!edit);
+          }}
         >
           {edit ? "Save" : "Edit"}
         </Button>

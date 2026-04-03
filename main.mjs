@@ -1,9 +1,41 @@
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import { handleRequest } from './server/api.mjs';
 import { DEFAULT_BROWSER_WINDOW_OPTIONS, mode } from './server/constants.mjs';
+import { loadExpandedBounds, rememberExpandedBounds } from './server/minimize.mjs';
 import { createWindowsTray } from './server/tray.mjs';
 
 let mainWindow;
+
+const getInitialWindowBounds = () => {
+  const savedBounds = loadExpandedBounds();
+  const workArea = screen.getPrimaryDisplay().workArea;
+  const width = Math.min(
+    savedBounds?.width ?? DEFAULT_BROWSER_WINDOW_OPTIONS.width,
+    workArea.width
+  );
+  const height = Math.min(
+    savedBounds?.height ?? DEFAULT_BROWSER_WINDOW_OPTIONS.height,
+    workArea.height
+  );
+
+  const defaultX = workArea.x + workArea.width - width;
+  const defaultY = workArea.y;
+  const maxX = workArea.x + workArea.width - width;
+  const maxY = workArea.y + workArea.height - height;
+
+  return {
+    width,
+    height,
+    x:
+      savedBounds && Number.isFinite(savedBounds.x)
+        ? Math.max(workArea.x, Math.min(savedBounds.x, maxX))
+        : defaultX,
+    y:
+      savedBounds && Number.isFinite(savedBounds.y)
+        ? Math.max(workArea.y, Math.min(savedBounds.y, maxY))
+        : defaultY,
+  };
+};
 
 // Check if another instance of the app is already running
 const gotTheLock = app.requestSingleInstanceLock();
@@ -20,13 +52,13 @@ if (!gotTheLock) {
   });
 
   app.on('ready', () => {
-    const { width: screenWidth } = screen.getPrimaryDisplay().workAreaSize;
+    const initialBounds = getInitialWindowBounds();
 
     mainWindow = new BrowserWindow({
       ...DEFAULT_BROWSER_WINDOW_OPTIONS,
-      x: screenWidth - 300,  // Position the window at the top right corner
-      y: 0,                  // Top of the screen
+      ...initialBounds,
     });
+    rememberExpandedBounds(mainWindow);
 
     if (mode === 'production') {
       mainWindow.loadFile('dist/index.html');
@@ -40,6 +72,9 @@ if (!gotTheLock) {
     if (process.platform !== 'darwin') {
       createWindowsTray(mainWindow);
     }
+
+    mainWindow.on('resize', () => rememberExpandedBounds(mainWindow));
+    mainWindow.on('move', () => rememberExpandedBounds(mainWindow));
 
     // Handle message from renderer
     ipcMain.on('request', async (event, data) => {
@@ -64,4 +99,3 @@ if (!gotTheLock) {
     }
   });
 }
-

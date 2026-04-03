@@ -1,7 +1,7 @@
 import React from "react";
 import { usePageStore } from "../store";
 import { PopoverInput } from "./PopoverInput";
-import { Button } from "antd";
+import { Button, Dropdown } from "antd";
 import {
   PlusOutlined,
   CaretDownOutlined,
@@ -13,18 +13,23 @@ import {
 import { request } from "../api";
 import { HomeMenuDropdown } from "./HomeMenuDropdown";
 import { formatTime } from "../utils/dateUtils";
+import { MinimizeVariant } from "../types";
 
 export const Header = () => {
   const minimize = usePageStore((state) => state.minimize);
+  const minimizeVariant = usePageStore((state) => state.minimizeVariant);
+  const isCompactMode = minimize && minimizeVariant === "compact";
+  const useExpandedHeaderLayout = !minimize || isCompactMode;
   const workingProjectName = usePageStore((state) => state.workingProjectName);
   const lastStartedProjectName = usePageStore(
     (state) => state.lastStartedProjectName
   );
   const isRunning = Boolean(workingProjectName);
-  const compactProjectName = workingProjectName || lastStartedProjectName;
   const now = usePageStore((state) => state.now);
   const startTime = usePageStore((state) => state.startTime);
   const projects = usePageStore((state) => state.projects);
+  const compactProjectName =
+    workingProjectName || lastStartedProjectName || projects[0]?.name || "";
   const compactProjectTotalTime =
     (projects
       .find((project) => project.name === compactProjectName)
@@ -32,10 +37,20 @@ export const Header = () => {
     0) +
     (isRunning && startTime ? (now ?? Date.now()) - startTime : 0);
 
-  const toggleMinimize = () => {
-    const nextMinimize = !minimize;
-    usePageStore.setState({ minimize: nextMinimize });
-    request({ method: "minimize", payload: nextMinimize });
+  const setMinimizeMode = (variant: MinimizeVariant) => {
+    usePageStore.setState({ minimize: true, minimizeVariant: variant });
+    request({
+      method: "minimize",
+      payload: { minimized: true, variant },
+    });
+  };
+
+  const restoreWindow = () => {
+    usePageStore.setState({ minimize: false });
+    request({
+      method: "minimize",
+      payload: { minimized: false, variant: minimizeVariant },
+    });
   };
 
   const handleCompactToggle = () => {
@@ -54,12 +69,14 @@ export const Header = () => {
       style={{
         width: "100%",
         display: "grid",
-        gridTemplateColumns: minimize ? "1fr auto auto" : "75px 1fr 75px",
+        gridTemplateColumns: useExpandedHeaderLayout
+          ? "75px 1fr 75px"
+          : "1fr auto auto",
         marginBottom: 10,
         alignItems: "center",
       }}
     >
-      {minimize ? (
+      {!useExpandedHeaderLayout ? (
         <div
           style={{
             textAlign: "left",
@@ -75,8 +92,8 @@ export const Header = () => {
       ) : (
         <div />
       )}
-      <div style={{ textAlign: minimize ? "left" : "center" }}>
-        {minimize ? "" : "Project Tracker"}
+      <div style={{ textAlign: useExpandedHeaderLayout ? "center" : "left" }}>
+        {useExpandedHeaderLayout ? "Project Tracker" : ""}
       </div>
       <div
         className="no-drag"
@@ -87,7 +104,7 @@ export const Header = () => {
           textAlign: "right",
         }}
       >
-        {minimize && (
+        {!useExpandedHeaderLayout && (
           <Button
             size="small"
             icon={isRunning ? <PauseCircleFilled /> : <CaretRightOutlined />}
@@ -99,12 +116,28 @@ export const Header = () => {
             {isRunning ? "Pause" : "Start"}
           </Button>
         )}
-        <Button
-          icon={minimize ? <ArrowsAltOutlined /> : <ShrinkOutlined />}
-          size="small"
-          onClick={toggleMinimize}
-        />
-        {!minimize && (
+        {minimize ? (
+          <Button
+            icon={<ArrowsAltOutlined />}
+            size="small"
+            onClick={restoreWindow}
+          />
+        ) : (
+          <Dropdown
+            trigger={["click"]}
+            placement="bottomRight"
+            menu={{
+              items: [
+                { key: "minimize", label: "Minimize" },
+                { key: "compact", label: "Compact" },
+              ],
+              onClick: ({ key }) => setMinimizeMode(key as MinimizeVariant),
+            }}
+          >
+            <Button icon={<ShrinkOutlined />} size="small" />
+          </Dropdown>
+        )}
+        {useExpandedHeaderLayout && (
           <>
             <PopoverInput
               onConfirm={async (inputValue) => {

@@ -17,7 +17,15 @@ export const ProjectList = ({ projectNames }: { projectNames: string[] }) => {
     <DragDropContext onDragEnd={handleDragEnd}>
       <Droppable droppableId="droppable">
         {(provided) => (
-          <div {...provided.droppableProps} ref={provided.innerRef}>
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
             {projectNames.map((name, index) => (
               <Draggable key={name} draggableId={name} index={index}>
                 {(provided) => (
@@ -27,6 +35,7 @@ export const ProjectList = ({ projectNames }: { projectNames: string[] }) => {
                     style={{
                       display: "flex",
                       alignItems: "center",
+                      width: "100%",
                       ...provided.draggableProps.style,
                     }}
                   >

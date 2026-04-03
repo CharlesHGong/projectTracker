@@ -8,6 +8,12 @@ const defaultDb = {
   projects: [],
   displayingProjectNames: [],
 };
+
+const normalizeProject = (project) => ({
+  ...project,
+  code: project.code ?? '',
+  logs: project.logs ?? [],
+});
 console.log('db location', `${app.getPath('appData')}/${APP_NAME}/db.json`);
 const loadDb = async () => {
   const db = await JSONFilePreset(`${app.getPath('appData')}/${APP_NAME}/db.json`, defaultDb);
@@ -17,7 +23,7 @@ const loadDb = async () => {
 
 export const createProject = async (name) => {
   const db = await loadDb();
-  db.data.projects.push({ name, logs: [] });
+  db.data.projects.push({ name, code: '', logs: [] });
   await db.write();
   return;
 };
@@ -36,18 +42,33 @@ export const getProjects = async ({ projectNames, range }) => {
   const lowerBound = getStartOfRange(Date.now(), range);
   const unOrderedProjects = db.data.projects
     .filter((project) => projectNames.includes(project.name))
-    .map(p => ({ ...p, logs: p.logs.filter((log) => log.startTime >= lowerBound) }));
+    .map((project) => {
+      const normalizedProject = normalizeProject(project);
+      return {
+        ...normalizedProject,
+        logs: normalizedProject.logs.filter((log) => log.startTime >= lowerBound),
+      };
+    });
   return projectNames.map((name) => unOrderedProjects.find((project) => project.name === name)).filter(Boolean);
 }
 
 export const getProject = async (name) => {
   const db = await loadDb();
-  return db.data.projects.find((project) => project.name === name);
+  const project = db.data.projects.find((item) => item.name === name);
+  return project ? normalizeProject(project) : undefined;
 }
 
 export const updateProject = async ({ name, project }) => {
   const db = await loadDb();
-  db.data.projects = db.data.projects.map((p) => p.name === name ? { ...p, ...project } : p);
+  const nextName = project.name;
+  db.data.projects = db.data.projects.map((p) =>
+    p.name === name ? normalizeProject({ ...p, ...project }) : normalizeProject(p)
+  );
+  if (nextName && nextName !== name) {
+    db.data.displayingProjectNames = db.data.displayingProjectNames.map((projectName) =>
+      projectName === name ? nextName : projectName
+    );
+  }
   await db.write();
   return;
 }
@@ -78,7 +99,13 @@ export const updateDisplayingProjectNames = async (selectedProjectNames) => {
 export const getLogsBetweenDates = async ({ startDate, endDate }) => {
   const db = await loadDb();
   const logs = db.data.projects.flatMap((project) => (
-    project.logs.filter((log) => log.startTime >= startDate && log.endTime <= endDate).map((log) => ({ ...log, projectName: project.name }))
+    normalizeProject(project).logs
+      .filter((log) => log.startTime >= startDate && log.endTime <= endDate)
+      .map((log) => ({
+        ...log,
+        projectName: project.name,
+        projectCode: project.code ?? '',
+      }))
   ));
   return logs;
 }

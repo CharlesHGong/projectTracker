@@ -5,8 +5,11 @@ export type Log = {
 
 export type Project = {
   name: string;
+  code: string;
   logs: Log[];
 };
+
+export type MinimizeVariant = "minimize" | "compact";
 
 export const rangeLabelMap = {
   day: "Today",

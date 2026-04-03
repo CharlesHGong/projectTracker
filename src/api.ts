@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { Log, Project, TimeRangeOption } from "./types";
+import { Log, MinimizeVariant, Project, TimeRangeOption } from "./types";
 
 declare global {
   interface Window {
@@ -30,7 +30,10 @@ type RequestArgs =
       method: "exportLogs";
       payload: { type: string; startTime: number; endTime: number };
     }
-  | { method: "minimize"; payload: boolean };
+  | {
+      method: "minimize";
+      payload: { minimized: boolean; variant: MinimizeVariant };
+    };
 
 // Define the return types associated with each method
 type RequestReturnType<T extends RequestArgs["method"]> =

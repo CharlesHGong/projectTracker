@@ -3,10 +3,12 @@ import { usePageStore } from "../store";
 import { Header } from "../components/HomeHeader";
 import { formatTime } from "../utils/dateUtils";
 import { ProjectList } from "../components/ProjectList";
+import { ProjectTracker } from "../components/ProjectTracker";
 import { rangeLabelMap } from "../types";
 
 export const HomePage = () => {
   const minimize = usePageStore((state) => state.minimize);
+  const minimizeVariant = usePageStore((state) => state.minimizeVariant);
   const projects = usePageStore((state) => state.projects);
   const previousTime = usePageStore((state) =>
     state.projects
@@ -32,7 +34,7 @@ export const HomePage = () => {
       }}
     >
       <Header />
-      {!minimize && (
+      {!minimize ? (
         <>
           <div
             style={{
@@ -58,7 +60,24 @@ export const HomePage = () => {
             <div />
           </div>
         </>
-      )}
+      ) : minimizeVariant === "compact" ? (
+        <div
+          style={{
+            flex: "1 1 auto",
+            overflowY: "auto",
+            overflowX: "hidden",
+            width: "100%",
+            paddingRight: "4px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+          }}
+        >
+          {projects.slice(0, 3).map((project) => (
+            <ProjectTracker key={project.name} name={project.name} />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 };

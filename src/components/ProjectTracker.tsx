@@ -31,15 +31,20 @@ export const ProjectTracker = ({ name }: { name: string }) => {
   return (
     <div
       style={{
-        margin: "4px 0px",
         width: "100%",
         display: "grid",
-        gridTemplateColumns: "1fr 1fr 1fr",
+        gridTemplateColumns: "minmax(0, 1.7fr) minmax(64px, 0.9fr) auto",
+        columnGap: 8,
         alignItems: "center",
       }}
     >
       <span
-        style={{ textAlign: "left", display: "flex", alignItems: "center" }}
+        style={{
+          textAlign: "left",
+          display: "flex",
+          alignItems: "center",
+          minWidth: 0,
+        }}
       >
         <Button
           className="no-drag"
@@ -48,7 +53,15 @@ export const ProjectTracker = ({ name }: { name: string }) => {
           type="link"
           onClick={() => usePageStore.setState({ page: `project/${name}` })}
         />
-        <span>{name}</span>
+        <span
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {name}
+        </span>
       </span>
       <span style={{ textAlign: "center" }}>{formatTime(totalTime)}</span>
       <Button
@@ -57,6 +70,7 @@ export const ProjectTracker = ({ name }: { name: string }) => {
         onClick={handleClick}
         variant="solid"
         color={startTime ? "danger" : "primary"}
+        style={{ justifySelf: "end", width: 52 }}
       >
         {startTime ? "End" : "Start"}
       </Button>

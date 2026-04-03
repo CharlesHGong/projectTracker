@@ -1,10 +1,25 @@
 import { create } from "zustand";
 import { request } from "./api";
-import { Log, Project, TimeRangeOption } from "./types";
+import { Log, MinimizeVariant, Project, TimeRangeOption } from "./types";
+
+const moveItemToFront = <T,>(
+  items: T[],
+  predicate: (item: T) => boolean
+): T[] => {
+  const itemIndex = items.findIndex(predicate);
+  if (itemIndex <= 0) {
+    return items;
+  }
+  const nextItems = Array.from(items);
+  const [item] = nextItems.splice(itemIndex, 1);
+  nextItems.unshift(item);
+  return nextItems;
+};
 
 type PageStore = {
   page: string;
   minimize: boolean;
+  minimizeVariant: MinimizeVariant;
   range: TimeRangeOption;
   bgAlpha: number;
   setBgAlpha: (a: number) => void;
@@ -23,12 +38,16 @@ type PageStore = {
   deleteProject: (name: string) => void;
   getProjectNames: () => void;
   handleStartOrStop: (name: string, isStart: boolean) => void;
-  updateName: (name: string, newName: string) => void;
+  updateProjectDetails: (
+    name: string,
+    updates: Partial<Pick<Project, "name" | "code">>
+  ) => Promise<void>;
 };
 
 export const usePageStore = create<PageStore>((set, get) => ({
   page: "home",
   minimize: false,
+  minimizeVariant: "minimize",
   range: "day",
   bgAlpha: parseFloat(localStorage.getItem("bgAlpha") ?? "0.8"),
   setBgAlpha: (a) => {
@@ -123,6 +142,23 @@ export const usePageStore = create<PageStore>((set, get) => ({
   },
   handleStartOrStop: async (name, isStart) => {
     const { startTime, timeIntervalRef, workingProjectName, addLog } = get();
+    const reorderedSelectedProjectNames = moveItemToFront(
+      get().selectedProjectNames,
+      (projectName) => projectName === name
+    );
+    const reorderedProjects = moveItemToFront(
+      get().projects,
+      (project) => project.name === name
+    );
+    set({
+      selectedProjectNames: reorderedSelectedProjectNames,
+      projects: reorderedProjects,
+    });
+    request({
+      method: "updateDisplayingProjectNames",
+      payload: reorderedSelectedProjectNames,
+    });
+
     if (isStart) {
       if (name !== workingProjectName && startTime) {
         clearInterval(timeIntervalRef);
@@ -149,18 +185,14 @@ export const usePageStore = create<PageStore>((set, get) => ({
       });
     }
   },
-  updateName: async (name, newName) => {
-    const { selectedProjectNames, loadProjects } = get();
+  updateProjectDetails: async (name, updates) => {
     await request({
       method: "updateProject",
-      payload: { name, project: { name: newName } },
+      payload: { name, project: updates },
     });
-    set({
-      page: `project/${newName}`,
-      selectedProjectNames: selectedProjectNames
-        .filter((pn) => pn !== name)
-        .concat(newName),
-    });
-    loadProjects();
+    if (updates.name && updates.name !== name) {
+      set({ page: `project/${updates.name}` });
+    }
+    await get().getProjectNames();
   },
 }));
