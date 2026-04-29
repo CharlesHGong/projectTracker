@@ -1,11 +1,33 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { ProjectTracker } from "./ProjectTracker";
 import { usePageStore } from "../store";
 import type { DropResult } from "@hello-pangea/dnd";
+import type { Project } from "../types";
 
-export const ProjectList = ({ projectNames }: { projectNames: string[] }) => {
+type ProjectListProps = {
+  projects: Project[];
+  isDragDisabled?: boolean;
+};
+
+const ProjectListComponent = ({
+  projects,
+  isDragDisabled = false,
+}: ProjectListProps) => {
+  const projectRows = useMemo(
+    () =>
+      projects.map((project) => ({
+        name: project.name,
+        previousTime: project.logs.reduce(
+          (acc, log) => log.endTime - log.startTime + acc,
+          0
+        ),
+      })),
+    [projects]
+  );
+
   const handleDragEnd = (result: DropResult) => {
+    if (isDragDisabled) return;
     const { source, destination } = result;
     // Do nothing if item is dropped outside the list
     if (!destination) return;
@@ -26,8 +48,13 @@ export const ProjectList = ({ projectNames }: { projectNames: string[] }) => {
               gap: 8,
             }}
           >
-            {projectNames.map((name, index) => (
-              <Draggable key={name} draggableId={name} index={index}>
+            {projectRows.map(({ name, previousTime }, index) => (
+              <Draggable
+                key={name}
+                draggableId={name}
+                index={index}
+                isDragDisabled={isDragDisabled}
+              >
                 {(provided) => (
                   <div
                     ref={provided.innerRef}
@@ -39,8 +66,20 @@ export const ProjectList = ({ projectNames }: { projectNames: string[] }) => {
                       ...provided.draggableProps.style,
                     }}
                   >
-                    <div {...provided.dragHandleProps}>☰</div>
-                    <ProjectTracker name={name} key={name} />
+                    <div
+                      {...provided.dragHandleProps}
+                      style={{
+                        opacity: isDragDisabled ? 0.35 : 1,
+                        cursor: isDragDisabled ? "not-allowed" : "grab",
+                      }}
+                    >
+                      ☰
+                    </div>
+                    <ProjectTracker
+                      name={name}
+                      previousTime={previousTime}
+                      key={name}
+                    />
                   </div>
                 )}
               </Draggable>
@@ -52,3 +91,5 @@ export const ProjectList = ({ projectNames }: { projectNames: string[] }) => {
     </DragDropContext>
   );
 };
+
+export const ProjectList = React.memo(ProjectListComponent);

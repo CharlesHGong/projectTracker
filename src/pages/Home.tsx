@@ -1,4 +1,9 @@
-import React, { useEffect } from "react";
+import React, {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { usePageStore } from "../store";
 import { Header } from "../components/HomeHeader";
 import { formatTime } from "../utils/dateUtils";
@@ -6,10 +11,7 @@ import { ProjectList } from "../components/ProjectList";
 import { ProjectTracker } from "../components/ProjectTracker";
 import { rangeLabelMap } from "../types";
 
-export const HomePage = () => {
-  const minimize = usePageStore((state) => state.minimize);
-  const minimizeVariant = usePageStore((state) => state.minimizeVariant);
-  const projects = usePageStore((state) => state.projects);
+const TotalTimeFooter = () => {
   const previousTime = usePageStore((state) =>
     state.projects
       .flatMap((p) => p.logs)
@@ -21,9 +23,47 @@ export const HomePage = () => {
   const totalTime = formatTime(previousTime + currentTime);
   const range = usePageStore((state) => state.range);
 
+  return (
+    <div
+      style={{
+        width: "100%",
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr 1fr",
+        alignItems: "baseline",
+        paddingLeft: "8px",
+      }}
+    >
+      <div style={{ marginLeft: 16 }}>{rangeLabelMap[range]}</div>
+      <div style={{ textAlign: "center" }}>{totalTime}</div>
+      <div />
+    </div>
+  );
+};
+
+export const HomePage = () => {
+  const [projectSearch, setProjectSearch] = useState("");
+  const [isProjectSearchOpen, setIsProjectSearchOpen] = useState(false);
+  const minimize = usePageStore((state) => state.minimize);
+  const minimizeVariant = usePageStore((state) => state.minimizeVariant);
+  const projects = usePageStore((state) => state.projects);
+
   useEffect(() => {
     usePageStore.getState().getProjectNames();
   }, []);
+
+  const deferredProjectSearch = useDeferredValue(projectSearch);
+  const normalizedProjectSearch = projectSearch.trim().toLowerCase();
+  const deferredNormalizedProjectSearch = deferredProjectSearch
+    .trim()
+    .toLowerCase();
+  const filteredProjects = useMemo(
+    () =>
+      projects.filter((project) =>
+        project.name.toLowerCase().includes(deferredNormalizedProjectSearch)
+      ),
+    [deferredNormalizedProjectSearch, projects]
+  );
+  const isProjectListFiltered = normalizedProjectSearch.length > 0;
 
   return (
     <div
@@ -33,7 +73,12 @@ export const HomePage = () => {
         flexDirection: "column",
       }}
     >
-      <Header />
+      <Header
+        projectSearch={projectSearch}
+        isProjectSearchOpen={isProjectSearchOpen}
+        onProjectSearchChange={setProjectSearch}
+        onProjectSearchOpenChange={setIsProjectSearchOpen}
+      />
       {!minimize ? (
         <>
           <div
@@ -44,21 +89,12 @@ export const HomePage = () => {
               width: "100%",
             }}
           >
-            <ProjectList projectNames={projects.map((p) => p.name)} />
+            <ProjectList
+              projects={filteredProjects}
+              isDragDisabled={isProjectListFiltered}
+            />
           </div>
-          <div
-            style={{
-              width: "100%",
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr",
-              alignItems: "baseline",
-              paddingLeft: "8px",
-            }}
-          >
-            <div style={{ marginLeft: 16 }}>{rangeLabelMap[range]}</div>
-            <div style={{ textAlign: "center" }}>{totalTime}</div>
-            <div />
-          </div>
+          <TotalTimeFooter />
         </>
       ) : minimizeVariant === "compact" ? (
         <div

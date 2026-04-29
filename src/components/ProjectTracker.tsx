@@ -4,76 +4,86 @@ import { Button } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { formatTime } from "../utils/dateUtils";
 
-export const ProjectTracker = ({ name }: { name: string }) => {
-  const now = usePageStore((state) =>
-    state.workingProjectName === name ? state.now : undefined
-  );
-  const startTime = usePageStore((state) =>
-    state.workingProjectName === name ? state.startTime : undefined
-  );
-  const previousTime = usePageStore((state) => {
-    const projectLogs =
-      state.projects.find((project) => project.name === name)?.logs || [];
-    return projectLogs.reduce(
-      (acc, log) => log.endTime - log.startTime + acc,
-      0
+type ProjectTrackerProps = {
+  name: string;
+  previousTime?: number;
+};
+
+export const ProjectTracker = React.memo(
+  ({ name, previousTime: providedPreviousTime }: ProjectTrackerProps) => {
+    const now = usePageStore((state) =>
+      state.workingProjectName === name ? state.now : undefined
     );
-  });
-  const totalTime =
-    previousTime +
-    (startTime ? Math.max(0, (now ?? Date.now()) - startTime) : 0);
+    const startTime = usePageStore((state) =>
+      state.workingProjectName === name ? state.startTime : undefined
+    );
+    const previousTime = usePageStore((state) => {
+      if (providedPreviousTime !== undefined) {
+        return providedPreviousTime;
+      }
+      const projectLogs =
+        state.projects.find((project) => project.name === name)?.logs || [];
+      return projectLogs.reduce(
+        (acc, log) => log.endTime - log.startTime + acc,
+        0
+      );
+    });
+    const totalTime =
+      previousTime +
+      (startTime ? Math.max(0, (now ?? Date.now()) - startTime) : 0);
 
-  const handleClick = () => {
-    const { handleStartOrStop } = usePageStore.getState();
-    handleStartOrStop(name, !Boolean(startTime));
-  };
+    const handleClick = () => {
+      const { handleStartOrStop } = usePageStore.getState();
+      handleStartOrStop(name, !Boolean(startTime));
+    };
 
-  return (
-    <div
-      style={{
-        width: "100%",
-        display: "grid",
-        gridTemplateColumns: "minmax(0, 1.7fr) minmax(64px, 0.9fr) auto",
-        columnGap: 8,
-        alignItems: "center",
-      }}
-    >
-      <span
+    return (
+      <div
         style={{
-          textAlign: "left",
-          display: "flex",
+          width: "100%",
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1.7fr) minmax(64px, 0.9fr) auto",
+          columnGap: 8,
           alignItems: "center",
-          minWidth: 0,
         }}
       >
-        <Button
-          className="no-drag"
-          icon={<InfoCircleOutlined />}
-          size="small"
-          type="link"
-          onClick={() => usePageStore.setState({ page: `project/${name}` })}
-        />
         <span
           style={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
+            textAlign: "left",
+            display: "flex",
+            alignItems: "center",
+            minWidth: 0,
           }}
         >
-          {name}
+          <Button
+            className="no-drag"
+            icon={<InfoCircleOutlined />}
+            size="small"
+            type="link"
+            onClick={() => usePageStore.setState({ page: `project/${name}` })}
+          />
+          <span
+            style={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {name}
+          </span>
         </span>
-      </span>
-      <span style={{ textAlign: "center" }}>{formatTime(totalTime)}</span>
-      <Button
-        className="no-drag"
-        size="small"
-        onClick={handleClick}
-        variant="solid"
-        color={startTime ? "danger" : "primary"}
-        style={{ justifySelf: "end", width: 52 }}
-      >
-        {startTime ? "End" : "Start"}
-      </Button>
-    </div>
-  );
-};
+        <span style={{ textAlign: "center" }}>{formatTime(totalTime)}</span>
+        <Button
+          className="no-drag"
+          size="small"
+          onClick={handleClick}
+          variant="solid"
+          color={startTime ? "danger" : "primary"}
+          style={{ justifySelf: "end", width: 52 }}
+        >
+          {startTime ? "End" : "Start"}
+        </Button>
+      </div>
+    );
+  }
+);

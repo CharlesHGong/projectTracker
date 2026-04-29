@@ -1,7 +1,7 @@
 import React from "react";
 import { usePageStore } from "../store";
 import { PopoverInput } from "./PopoverInput";
-import { Button, Dropdown } from "antd";
+import { Button, Dropdown, Input } from "antd";
 import {
   PlusOutlined,
   CaretDownOutlined,
@@ -9,17 +9,32 @@ import {
   ArrowsAltOutlined,
   PauseCircleFilled,
   CaretRightOutlined,
+  SearchOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { request } from "../api";
 import { HomeMenuDropdown } from "./HomeMenuDropdown";
 import { formatTime } from "../utils/dateUtils";
 import { MinimizeVariant } from "../types";
 
-export const Header = () => {
+type HeaderProps = {
+  projectSearch: string;
+  isProjectSearchOpen: boolean;
+  onProjectSearchChange: (value: string) => void;
+  onProjectSearchOpenChange: (open: boolean) => void;
+};
+
+export const Header = ({
+  projectSearch,
+  isProjectSearchOpen,
+  onProjectSearchChange,
+  onProjectSearchOpenChange,
+}: HeaderProps) => {
   const minimize = usePageStore((state) => state.minimize);
   const minimizeVariant = usePageStore((state) => state.minimizeVariant);
   const isCompactMode = minimize && minimizeVariant === "compact";
   const useExpandedHeaderLayout = !minimize || isCompactMode;
+  const canSearchProjects = !minimize;
   const workingProjectName = usePageStore((state) => state.workingProjectName);
   const lastStartedProjectName = usePageStore(
     (state) => state.lastStartedProjectName
@@ -63,6 +78,11 @@ export const Header = () => {
     );
   };
 
+  const closeProjectSearch = () => {
+    onProjectSearchChange("");
+    onProjectSearchOpenChange(false);
+  };
+
   return (
     <div
       className="header"
@@ -72,6 +92,7 @@ export const Header = () => {
         gridTemplateColumns: useExpandedHeaderLayout
           ? "75px 1fr 75px"
           : "1fr auto auto",
+        height: 24,
         marginBottom: 10,
         alignItems: "center",
       }}
@@ -92,8 +113,70 @@ export const Header = () => {
       ) : (
         <div />
       )}
-      <div style={{ textAlign: useExpandedHeaderLayout ? "center" : "left" }}>
-        {useExpandedHeaderLayout ? "Project Tracker" : ""}
+      <div
+        style={{
+          textAlign: useExpandedHeaderLayout ? "center" : "left",
+          minWidth: 0,
+        }}
+      >
+        {useExpandedHeaderLayout ? (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              minWidth: 0,
+            }}
+          >
+            <span style={{ whiteSpace: "nowrap" }}>Project Tracker</span>
+            {canSearchProjects &&
+              (isProjectSearchOpen ? (
+                <Input
+                  autoFocus
+                  className="no-drag"
+                  size="small"
+                  placeholder="Search projects"
+                  value={projectSearch}
+                  onChange={(event) =>
+                    onProjectSearchChange(event.target.value)
+                  }
+                  prefix={<SearchOutlined />}
+                  suffix={
+                    <Button
+                      aria-label="Clear project search"
+                      icon={<CloseOutlined />}
+                      size="small"
+                      type="text"
+                      onClick={closeProjectSearch}
+                      style={{
+                        width: 18,
+                        minWidth: 18,
+                        height: 18,
+                        padding: 0,
+                      }}
+                    />
+                  }
+                  style={{
+                    width: "clamp(88px, 32vw, 180px)",
+                    height: 24,
+                  }}
+                />
+              ) : (
+                <Button
+                  aria-label="Search projects"
+                  className="no-drag"
+                  icon={<SearchOutlined />}
+                  size="small"
+                  type="text"
+                  onClick={() => onProjectSearchOpenChange(true)}
+                  style={{ color: "white" }}
+                />
+              ))}
+          </div>
+        ) : (
+          ""
+        )}
       </div>
       <div
         className="no-drag"
