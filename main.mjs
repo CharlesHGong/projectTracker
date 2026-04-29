@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import { handleRequest } from './server/api.mjs';
+import { setupAutoUpdates } from './server/autoUpdate.mjs';
 import { DEFAULT_BROWSER_WINDOW_OPTIONS, mode } from './server/constants.mjs';
 import { loadExpandedBounds, rememberExpandedBounds } from './server/minimize.mjs';
 import { createWindowsTray } from './server/tray.mjs';
@@ -72,6 +73,8 @@ if (!gotTheLock) {
     if (process.platform !== 'darwin') {
       createWindowsTray(mainWindow);
     }
+
+    setupAutoUpdates(mainWindow);
 
     mainWindow.on('resize', () => rememberExpandedBounds(mainWindow));
     mainWindow.on('move', () => rememberExpandedBounds(mainWindow));

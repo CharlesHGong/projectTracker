@@ -14,9 +14,18 @@
   "build": {
     "appId": "com.charles-gong.projecttimetracker",
     "productName": "Project Time Tracker",
+    "artifactName": "Project-Time-Tracker-Setup-${version}.${ext}",
     "directories": {
       "output": "app"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "CharlesHGong",
+        "repo": "projectTracker",
+        "releaseType": "release"
+      }
+    ],
     "win": {
       "target": "nsis",
       "icon": "public/icon.png"
@@ -29,6 +38,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CharlesHGong/projectTracker.git"
+  },
   "dependencies": {
     "@ant-design/icons": "^5.5.1",
     "@hello-pangea/dnd": "^17.0.0",
@@ -36,6 +49,7 @@
     "css-loader": "^7.1.2",
     "dayjs": "^1.11.13",
     "electron-reload": "^2.0.0-alpha.1",
+    "electron-updater": "^6.8.3",
     "lowdb": "^7.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
