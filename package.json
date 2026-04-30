@@ -14,7 +14,6 @@
   "build": {
     "appId": "com.charles-gong.projecttimetracker",
     "productName": "Project Time Tracker",
-    "artifactName": "Project-Time-Tracker-Setup-${version}.${ext}",
     "directories": {
       "output": "app"
     },
@@ -27,12 +26,19 @@
       }
     ],
     "win": {
-      "target": "nsis",
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "icon": "public/icon.png"
     },
     "nsis": {
+      "artifactName": "Project-Time-Tracker-Setup-${version}.${ext}",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
+    },
+    "portable": {
+      "artifactName": "Project-Time-Tracker-Portable-${version}.${ext}"
     }
   },
   "keywords": [],
