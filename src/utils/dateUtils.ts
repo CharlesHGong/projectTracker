@@ -9,6 +9,14 @@ export const formatTime = (totalTime: number) => {
     .padStart(2, "0")}`;
 };
 
+const formatTimeMinutes = (totalTime: number) => {
+  const hours = Math.floor(totalTime / 3600000);
+  const minutes = Math.floor((totalTime % 3600000) / 60000);
+  return `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}m`;
+};
+
 const formatDateDisplay = (date: Date) => {
   const day = date.getDate();
   const month = date.getMonth() + 1;
@@ -26,36 +34,63 @@ const formatTimeDisplay = (date: Date) => {
     .padStart(2, "0")}`;
 };
 
+const isValidLog = ({ startTime, endTime }: Log) =>
+  Number.isFinite(startTime) && Number.isFinite(endTime) && endTime > startTime;
+
+const getStartOfDay = (date: Date) => {
+  const day = new Date(date);
+  day.setHours(0, 0, 0, 0);
+  return day;
+};
+
+const getStartOfMonth = (date: Date) =>
+  new Date(date.getFullYear(), date.getMonth(), 1);
+
+const mapBucketsToGroups = (
+  lmap: Map<number, number>,
+  formatBucket: (bucketStart: number) => string
+) =>
+  Array.from(lmap.entries())
+    .sort(([a], [b]) => a - b)
+    .map(([bucketStart, totalTime]) => ({
+      start: formatBucket(bucketStart),
+      time: formatTimeMinutes(totalTime),
+    }));
+
 export function groupDatesByDay(logs: Log[]) {
-  const lmap = logs.reduce((acc: Record<string, number>, log) => {
-    const day = formatDateDisplay(new Date(log.startTime));
-    if (!acc[day]) {
-      acc[day] = 0;
+  const lmap = logs.reduce((acc: Map<number, number>, log) => {
+    if (!isValidLog(log)) {
+      return acc;
     }
-    acc[day] += log.endTime - log.startTime;
+
+    const dayStart = getStartOfDay(new Date(log.startTime)).getTime();
+    acc.set(dayStart, (acc.get(dayStart) ?? 0) + log.endTime - log.startTime);
+
     return acc;
-  }, {});
-  return Object.keys(lmap).map((key) => ({
-    start: key,
-    time: formatTime(lmap[key]),
-  }));
+  }, new Map<number, number>());
+
+  return mapBucketsToGroups(lmap, (bucketStart) =>
+    formatDateDisplay(new Date(bucketStart))
+  );
 }
 
 export function groupDatesByWeek(logs: Log[]) {
-  const lmap = logs.reduce((acc: Record<string, number>, log) => {
-    const startOfWeek = formatDateDisplay(
-      getStartOfWeek(new Date(log.startTime))
-    ); // Get the start of the week in 'YYYY-MM-DD' format
-    if (!acc[startOfWeek]) {
-      acc[startOfWeek] = 0;
+  const lmap = logs.reduce((acc: Map<number, number>, log) => {
+    if (!isValidLog(log)) {
+      return acc;
     }
-    acc[startOfWeek] += log.endTime - log.startTime;
+
+    const startOfWeek = getStartOfWeek(new Date(log.startTime)).getTime();
+    acc.set(
+      startOfWeek,
+      (acc.get(startOfWeek) ?? 0) + log.endTime - log.startTime
+    );
     return acc;
-  }, {});
-  return Object.keys(lmap).map((key) => ({
-    start: key,
-    time: formatTime(lmap[key]),
-  }));
+  }, new Map<number, number>());
+
+  return mapBucketsToGroups(lmap, (bucketStart) =>
+    formatDateDisplay(new Date(bucketStart))
+  );
 }
 
 export function getStartOfWeek(date: Date) {
@@ -68,30 +103,35 @@ export function getStartOfWeek(date: Date) {
 }
 
 export function groupDatesByMonth(logs: Log[]) {
-  const lmap = logs.reduce((acc: Record<string, number>, log) => {
-    const mDate = new Date(log.startTime);
-    const month = `${(mDate.getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}/${mDate.getFullYear()}`; // Extract 'YYYY-MM' part
-    if (!acc[month]) {
-      acc[month] = 0;
+  const lmap = logs.reduce((acc: Map<number, number>, log) => {
+    if (!isValidLog(log)) {
+      return acc;
     }
-    acc[month] += log.endTime - log.startTime;
+
+    const monthStart = getStartOfMonth(new Date(log.startTime)).getTime();
+    acc.set(
+      monthStart,
+      (acc.get(monthStart) ?? 0) + log.endTime - log.startTime
+    );
     return acc;
-  }, {});
-  return Object.keys(lmap).map((key) => ({
-    start: key,
-    time: formatTime(lmap[key]),
-  }));
+  }, new Map<number, number>());
+
+  return mapBucketsToGroups(lmap, (bucketStart) => {
+    const mDate = new Date(bucketStart);
+    return `${(mDate.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}/${mDate.getFullYear()}`;
+  });
 }
 
 export function groupByNone(logs: Log[]) {
-  return logs.map(({ startTime, endTime }) => ({
+  return logs.map(({ startTime, endTime, description }) => ({
     start: `${formatDateDisplay(new Date(startTime))}-${formatTimeDisplay(
       new Date(startTime)
     )}`,
-    time: formatTime(endTime - startTime),
+    time: formatTimeMinutes(endTime - startTime),
     startTime,
     endTime,
+    description,
   }));
 }

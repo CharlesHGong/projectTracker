@@ -16,6 +16,11 @@ const moveItemToFront = <T,>(
   return nextItems;
 };
 
+const normalizeDescription = (description?: string | null) => {
+  const trimmedDescription = description?.trim();
+  return trimmedDescription ? trimmedDescription : null;
+};
+
 type PageStore = {
   page: string;
   minimize: boolean;
@@ -32,7 +37,12 @@ type PageStore = {
   projectNames: string[];
   selectedProjectNames: string[];
   reorderList: (sourceIndex: number, destinationIndex: number) => void;
-  addLog: (name: string, startTime: number, endTime: number) => void;
+  addLog: (
+    name: string,
+    startTime: number,
+    endTime: number,
+    description?: string | null
+  ) => Promise<void>;
   updateLog: (project: Project, previous: Log, after: Log) => Promise<Project>;
   loadProjects: () => void;
   deleteProject: (name: string) => void;
@@ -77,15 +87,20 @@ export const usePageStore = create<PageStore>((set, get) => ({
       payload: reorderedNames,
     });
   },
-  addLog: async (name, startTime, endTime) => {
+  addLog: async (name, startTime, endTime, description) => {
+    const log = {
+      startTime,
+      endTime,
+      description: normalizeDescription(description),
+    };
     await request({
       method: "addLog",
-      payload: { name, log: { startTime, endTime } },
+      payload: { name, log },
     });
     set({
       projects: get().projects.map((project) => {
         if (project.name === name) {
-          const newLogs = [...project.logs, { startTime, endTime }];
+          const newLogs = [...project.logs, log];
           newLogs.sort((a, b) => a.startTime - b.startTime);
           return {
             ...project,
@@ -97,11 +112,15 @@ export const usePageStore = create<PageStore>((set, get) => ({
     });
   },
   updateLog: async (project, previous, after) => {
+    const nextLog = {
+      ...after,
+      description: normalizeDescription(after.description),
+    };
     const newProject = {
       ...project,
       logs: project.logs.map((l) =>
         l.startTime === previous.startTime && l.endTime === previous.endTime
-          ? after
+          ? nextLog
           : l
       ),
     };

@@ -10,10 +10,24 @@ const defaultDb = {
   displayingProjectNames: [],
 };
 
+const normalizeDescription = (description) => {
+  if (typeof description !== 'string') {
+    return null;
+  }
+  const trimmedDescription = description.trim();
+  return trimmedDescription ? trimmedDescription : null;
+};
+
+const normalizeLog = (log) => ({
+  startTime: log.startTime,
+  endTime: log.endTime,
+  description: normalizeDescription(log.description),
+});
+
 const normalizeProject = (project) => ({
   ...project,
   code: project.code ?? '',
-  logs: project.logs ?? [],
+  logs: (project.logs ?? []).map(normalizeLog),
 });
 
 const getDbPath = () => path.join(app.getPath('appData'), APP_NAME, 'db.json');
@@ -60,7 +74,7 @@ export const createProject = async (name) => {
 export const addLog = async ({ name, log }) => {
   return withDbWrite(async (db) => {
     const project = db.data.projects.find((project) => project.name === name);
-    project.logs.push(log);
+    project.logs.push(normalizeLog(log));
     project.logs.sort((a, b) => a.startTime - b.startTime);
   });
 };
@@ -139,6 +153,7 @@ export const getLogsBetweenDates = async ({ startDate, endDate }) => {
           ...log,
           projectName: project.name,
           projectCode: project.code ?? '',
+          description: log.description ?? null,
         }))
     );
     return logs;

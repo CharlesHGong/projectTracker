@@ -16,7 +16,13 @@ import { Log, Project } from "../types";
 const getGroups = (
   logs: Log[],
   groupBy: string
-): { start: string; time: string; startTime?: number; endTime?: number }[] => {
+): {
+  start: string;
+  time: string;
+  startTime?: number;
+  endTime?: number;
+  description?: string | null;
+}[] => {
   switch (groupBy) {
     case "day":
       return groupDatesByDay(logs);
@@ -27,6 +33,89 @@ const getGroups = (
     default:
       return groupByNone(logs);
   }
+};
+
+const normalizeDescription = (description: string) => {
+  const trimmedDescription = description.trim();
+  return trimmedDescription ? trimmedDescription : null;
+};
+
+const EditableLogDescription = ({
+  project,
+  log,
+  setProject,
+}: {
+  project: Project;
+  log: Log;
+  setProject: React.Dispatch<React.SetStateAction<Project | null>>;
+}) => {
+  const [description, setDescription] = useState(log.description ?? "");
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (!isEditing) {
+      setDescription(log.description ?? "");
+    }
+  }, [isEditing, log.description, log.endTime, log.startTime]);
+
+  const saveDescription = async () => {
+    const nextDescription = normalizeDescription(description);
+    if ((log.description ?? null) === nextDescription) {
+      setIsEditing(false);
+      return;
+    }
+
+    const newProject = await usePageStore
+      .getState()
+      .updateLog(project, log, {
+        ...log,
+        description: nextDescription,
+      });
+    setProject(newProject);
+    setIsEditing(false);
+  };
+
+  return isEditing ? (
+    <Input
+      className="no-drag"
+      autoFocus
+      size="small"
+      value={description}
+      placeholder="Description"
+      onChange={(event) => setDescription(event.target.value)}
+      onBlur={saveDescription}
+      onPressEnter={(event) => event.currentTarget.blur()}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          setDescription(log.description ?? "");
+          setIsEditing(false);
+        }
+      }}
+      style={{ flex: "1 1 120px", minWidth: 0 }}
+    />
+  ) : (
+    <div
+      className="no-drag"
+      onClick={() => setIsEditing(true)}
+      style={{
+        flex: "1 1 120px",
+        minWidth: 0,
+        minHeight: 24,
+        lineHeight: "24px",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+        textAlign: "left",
+        color: "rgba(255, 255, 255, 0.72)",
+        cursor: "text",
+      }}
+      title={description}
+    >
+      {description || (
+        <span style={{ color: "rgba(255, 255, 255, 0.35)" }}>-</span>
+      )}
+    </div>
+  );
 };
 
 export const ProjectPage = ({ name }: { name: string }) => {
@@ -69,29 +158,52 @@ export const ProjectPage = ({ name }: { name: string }) => {
           />
         </div>
         <div style={{ textAlign: "center" }}>
-          {logsGrouped.map(({ start, time, startTime, endTime }) =>
+          {logsGrouped.map(({ start, time, startTime, endTime, description }) =>
             groupBy === "none" ? (
               <div
-                key={start}
+                key={`${startTime}-${endTime}`}
                 style={{
                   margin: "4px 0",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  gap: 8,
                 }}
               >
-                {start}: {time}s
-                {startTime && endTime && (
+                <span
+                  style={{
+                    textAlign: "left",
+                    minWidth: 0,
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
+                  {start}: {time}
+                </span>
+                {project &&
+                  startTime !== undefined &&
+                  endTime !== undefined && (
+                    <EditableLogDescription
+                      project={project}
+                      log={{ startTime, endTime, description }}
+                      setProject={setProject}
+                    />
+                  )}
+                {startTime !== undefined && endTime !== undefined && (
                   <PopoverDateRangePicker
                     defaultValue={[startTime, endTime]}
-                    onConfirm={async (range) => {
+                    defaultDescription={description}
+                    onConfirm={async (range, nextDescription) => {
                       if (!project) return;
                       const newProject = await usePageStore
                         .getState()
                         .updateLog(
                           project,
-                          { startTime, endTime },
-                          { startTime: range[0], endTime: range[1] }
+                          { startTime, endTime, description },
+                          {
+                            startTime: range[0],
+                            endTime: range[1],
+                            description: nextDescription,
+                          }
                         );
                       setProject(newProject);
                     }}
@@ -197,8 +309,10 @@ const Header = ({
       >
         <PopoverDateRangePicker
           defaultValue={[Date.now() - 1000 * 60 * 60, Date.now()]}
-          onConfirm={async (range) => {
-            await usePageStore.getState().addLog(name, range[0], range[1]);
+          onConfirm={async (range, description) => {
+            await usePageStore
+              .getState()
+              .addLog(name, range[0], range[1], description);
             loadProject();
           }}
           confirmText={"Add"}

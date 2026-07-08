@@ -4,6 +4,14 @@ import fs from 'fs';
 import path from 'path';
 
 const hoursInMs = 1000 * 60 * 60;
+const detailedLogHeaders = [
+  'Project',
+  'Project ID',
+  'Start Time',
+  'End Time',
+  'Length (h)',
+  'Description',
+];
 
 const escapeCsvValue = (value) => {
   const stringValue = String(value ?? '');
@@ -38,7 +46,7 @@ const exportReport = async ({ logs, startTime, endTime }) => {
     currentDate.setDate(currentDate.getDate() + 1);
   }
   const projectDateMap = getProjectDateMap(logs);
-  const headers = ['Project Name', 'Project Code', ...daysBetween.map(date => date.toLocaleDateString("en-US")), 'Total'];
+  const headers = ['Project Name', 'Project ID', ...daysBetween.map(date => date.toLocaleDateString("en-US")), 'Total'];
   const rows = Array.from(projectDetails.entries()).map(([projectName, projectCode]) => {
     const row = [projectName, projectCode];
     let sum = 0;
@@ -51,7 +59,15 @@ const exportReport = async ({ logs, startTime, endTime }) => {
     row.push(sum.toFixed(2));
     return row;
   });
-  const csvContent = [headers, ...rows]
+  const csvContent = [
+    headers,
+    ...rows,
+    [],
+    [],
+    [],
+    detailedLogHeaders,
+    ...getDetailedLogRows(logs),
+  ]
     .map((row) => row.map(escapeCsvValue).join(','))
     .join('\n');
   const filePath = path.join(`${app.getPath('downloads')}/report-${getFileName(startTime, endTime)}.csv`);
@@ -60,22 +76,25 @@ const exportReport = async ({ logs, startTime, endTime }) => {
 }
 
 const exportRawLogs = async ({ logs, startTime, endTime }) => {
-  const sortedLogs = [...logs];
-  sortedLogs.sort((a, b) => a.startTime - b.startTime);
-  const headers = ['Project Name', 'Project Code', 'Start Time', 'End Time', 'Duration(h)'];
-  const rows = sortedLogs.map(log => [
-    log.projectName,
-    log.projectCode ?? '',
-    new Date(log.startTime).toLocaleString(),
-    new Date(log.endTime).toLocaleString(),
-    ((log.endTime - log.startTime) / (1000 * 60 * 60)).toFixed(2)
-  ]);
-  const csvContent = [headers, ...rows]
+  const csvContent = [detailedLogHeaders, ...getDetailedLogRows(logs)]
     .map((row) => row.map(escapeCsvValue).join(','))
     .join('\n');
   const filePath = path.join(`${app.getPath('downloads')}/rawLogs-${getFileName(startTime, endTime)}.csv`);
   fs.writeFileSync(filePath, csvContent);
   return { success: true };
+};
+
+const getDetailedLogRows = (logs) => {
+  const sortedLogs = [...logs];
+  sortedLogs.sort((a, b) => a.startTime - b.startTime);
+  return sortedLogs.map(log => [
+    log.projectName,
+    log.projectCode ?? '',
+    new Date(log.startTime).toLocaleString(),
+    new Date(log.endTime).toLocaleString(),
+    ((log.endTime - log.startTime) / hoursInMs).toFixed(2),
+    log.description ?? '',
+  ]);
 };
 
 const getFileName = (startTime, endTime) => {

@@ -1,6 +1,7 @@
 export type Log = {
   startTime: number;
   endTime: number;
+  description?: string | null;
 };
 
 export type Project = {
