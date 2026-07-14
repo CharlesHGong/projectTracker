@@ -43,6 +43,32 @@ button {
   font-size: 1rem;
 }
 
+.active-log-description {
+  width: 100%;
+  min-width: 0;
+  min-height: 24px;
+  line-height: 24px;
+  box-sizing: border-box;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.72);
+  cursor: text;
+}
+
+.active-log-description:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.active-log-description-empty {
+  color: rgba(255, 255, 255, 0.35);
+}
+
 /* CSS to control the calendar dropdown width if needed */
 .one-month-calendar .ant-picker-panels {
   width: 300px; /* adjust width to suit single calendar layout */

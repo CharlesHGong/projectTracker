@@ -7,13 +7,14 @@ import {
   CaretDownOutlined,
   ShrinkOutlined,
   ArrowsAltOutlined,
-  PauseCircleFilled,
   CaretRightOutlined,
   SearchOutlined,
   CloseOutlined,
+  StopOutlined,
 } from "@ant-design/icons";
 import { request } from "../api";
 import { HomeMenuDropdown } from "./HomeMenuDropdown";
+import { ActiveLogDescriptionInput } from "./ActiveLogDescriptionInput";
 import { formatTime } from "../utils/dateUtils";
 import { MinimizeVariant } from "../types";
 
@@ -91,7 +92,8 @@ export const Header = ({
         display: "grid",
         gridTemplateColumns: useExpandedHeaderLayout
           ? "75px 1fr 75px"
-          : "1fr auto auto",
+          : "minmax(0, 1fr) auto auto",
+        columnGap: useExpandedHeaderLayout ? 0 : 8,
         height: 24,
         marginBottom: 10,
         alignItems: "center",
@@ -102,13 +104,37 @@ export const Header = ({
           style={{
             textAlign: "left",
             paddingLeft: "4px",
-            display: "flex",
-            gap: "8px",
+            display: "grid",
+            gridTemplateColumns: "minmax(0, 1fr) 100px 80px",
+            columnGap: 8,
             alignItems: "center",
+            minWidth: 0,
           }}
         >
-          <span>{compactProjectName}</span>
-          <span>{formatTime(compactProjectTotalTime)}</span>
+          <span
+            style={{
+              gridColumn: isRunning ? "1" : "1 / 3",
+              minWidth: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {compactProjectName}
+          </span>
+          {isRunning && (
+            <ActiveLogDescriptionInput style={{ gridColumn: "2" }} />
+          )}
+          <span
+            style={{
+              gridColumn: "3",
+              textAlign: "left",
+              fontVariantNumeric: "tabular-nums",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {formatTime(compactProjectTotalTime)}
+          </span>
         </div>
       ) : (
         <div />
@@ -183,20 +209,20 @@ export const Header = ({
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          gap: "6px",
+          gap: 8,
           textAlign: "right",
         }}
       >
         {!useExpandedHeaderLayout && (
           <Button
             size="small"
-            icon={isRunning ? <PauseCircleFilled /> : <CaretRightOutlined />}
+            icon={isRunning ? <StopOutlined /> : <CaretRightOutlined />}
             onClick={handleCompactToggle}
             color={isRunning ? "danger" : "primary"}
             variant="solid"
             disabled={!compactProjectName}
           >
-            {isRunning ? "Pause" : "Start"}
+            {isRunning ? "End" : "Start"}
           </Button>
         )}
         {minimize ? (

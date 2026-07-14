@@ -32,6 +32,8 @@ type PageStore = {
   now: number | undefined;
   workingProjectName: string;
   lastStartedProjectName: string;
+  activeLogDescription: string;
+  setActiveLogDescription: (description: string) => void;
   timeIntervalRef: NodeJS.Timeout | undefined;
   projects: Project[];
   projectNames: string[];
@@ -68,6 +70,8 @@ export const usePageStore = create<PageStore>((set, get) => ({
   now: undefined,
   workingProjectName: "",
   lastStartedProjectName: "",
+  activeLogDescription: "",
+  setActiveLogDescription: (description) => set({ activeLogDescription: description }),
   timeIntervalRef: undefined,
   projects: [],
   projectNames: [],
@@ -160,7 +164,13 @@ export const usePageStore = create<PageStore>((set, get) => ({
     get().loadProjects();
   },
   handleStartOrStop: async (name, isStart) => {
-    const { startTime, timeIntervalRef, workingProjectName, addLog } = get();
+    const {
+      startTime,
+      timeIntervalRef,
+      workingProjectName,
+      activeLogDescription,
+      addLog,
+    } = get();
     const reorderedSelectedProjectNames = moveItemToFront(
       get().selectedProjectNames,
       (projectName) => projectName === name
@@ -181,7 +191,7 @@ export const usePageStore = create<PageStore>((set, get) => ({
     if (isStart) {
       if (name !== workingProjectName && startTime) {
         clearInterval(timeIntervalRef);
-        addLog(workingProjectName, startTime, Date.now());
+        addLog(workingProjectName, startTime, Date.now(), activeLogDescription);
       }
       const newTimeIntervalRef = setInterval(() => {
         set({ now: Date.now() });
@@ -191,15 +201,17 @@ export const usePageStore = create<PageStore>((set, get) => ({
         now: Date.now(),
         workingProjectName: name,
         lastStartedProjectName: name,
+        activeLogDescription: "",
         timeIntervalRef: newTimeIntervalRef,
       });
     } else {
       clearInterval(timeIntervalRef);
-      addLog(name, startTime ?? Date.now(), Date.now());
+      addLog(name, startTime ?? Date.now(), Date.now(), activeLogDescription);
       set({
         startTime: undefined,
         now: undefined,
         workingProjectName: "",
+        activeLogDescription: "",
         timeIntervalRef: undefined,
       });
     }
